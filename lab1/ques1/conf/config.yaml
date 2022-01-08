@@ -1,0 +1,3 @@
+seed: 4
+num_pts: 5
+dist_type: multinomial
