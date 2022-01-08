@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import pathlib
 
 
-@hydra.main(config_path="conf", config_name="config")
+@hydra.main(config_path="conf", config_name="configs")
 def main(cfg):
     # np.random.seed(cfg.seed)
     pass
