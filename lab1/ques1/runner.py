@@ -13,7 +13,6 @@ def main(cfg):
         range = (0, 4)
     elif cfg.dist_type == "uniform":
         numbers = np.random.uniform(low=0, high=1, size=(cfg.num_pts,)) #.argmax(axis=1)
-        print(numbers)
         range = (0, 1)
     elif cfg.dist_type == "gaussian":
         numbers = np.random.normal(loc=0, scale=1, size=(cfg.num_pts,)) #.argmax(axis=1)
