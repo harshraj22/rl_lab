@@ -30,6 +30,10 @@ def get_transition_probs():
         if i+2 < 9:
             P[i,i+2] = 0
 
+    # from 8, let us assume we can not reach 8. This would help in calculating the probability of reaching 8
+    # only from other states
+    P[8, 8] = 0
+
     return P
 
 
@@ -39,7 +43,9 @@ class TestTransitionProbs(unittest.TestCase):
         cls.P = get_transition_probs()
 
     def test_row_sum_to_one(self):
-        for row, _ in enumerate(self.P):
+        """Each row should sum to 1. 
+        Note: It doesn't test the last row due to special condition that we defined."""
+        for row, _ in enumerate(self.P[:-1]):
             self.assertAlmostEqual(self.P[row].sum(), 1)
 
     def test_all_items_are_probs(self):
