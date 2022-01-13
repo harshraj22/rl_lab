@@ -1,0 +1,4 @@
+exp:
+  data_dir: figs
+  num_games: 10000
+  max_timestep_per_game: 40
