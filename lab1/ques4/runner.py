@@ -1,6 +1,5 @@
 import numpy as np
 import hydra
-import matplotlib.pyplot as plt
 import pathlib
 from data_loader.environments import SnakeAndLadderEnv
 
@@ -20,6 +19,7 @@ def main(cfg):
         rewards.append(reward)
         env.render()
     print(f'Reward: {np.sum(rewards)}')
+    env.close()
 
 
 if __name__ == '__main__':

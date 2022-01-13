@@ -2,7 +2,6 @@
 
 import gym
 import numpy as np
-from gym import spaces
 
 
 class SnakeAndLadderEnv(gym.Env):
@@ -29,11 +28,11 @@ class SnakeAndLadderEnv(gym.Env):
         self.dead_states = dead_states
         self.view = view if view else (self.num_states, )
 
-    def reset(self):
+    def reset(self) -> int:
         self.current_state = 0
         return self.current_state
 
-    def step(self, action):
+    def step(self, action: int) -> (int, float, bool, dict):
         # you can not step out of the board by taking an action. Such actions would be ignored.
         if self.current_state + action < self.num_states:
             self.current_state += action
@@ -43,8 +42,8 @@ class SnakeAndLadderEnv(gym.Env):
             bool(self.current_state in [self.num_states-1, *self.dead_states]),
             {}
         )
-   
-    def render(self):
+
+    def render(self) -> None:
         states = np.chararray(shape=(self.num_states,), unicode=True)
         for i in range(self.num_states):
             states[i] = str(i)
