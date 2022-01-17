@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import pathlib
+from utils.utils import sqrt_sin, calculate_area
 
 
 def main():
@@ -33,4 +34,5 @@ def main():
 
 if __name__ == "__main__":
     pathlib.Path(f'{pathlib.Path.cwd()}/figs/').mkdir(parents=True, exist_ok=True)
-    main()
+    # main()
+    print('Approx Area: ', calculate_area(lambda x: 1, num_bins=2))
