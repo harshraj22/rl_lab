@@ -24,11 +24,11 @@ def main(cfg):
         raise ValueError("dist_type must be one of 'multinomial', 'uniform', 'gaussian', 'exponential'")
 
     # ToDo: update the num of bins depending on the range of the distribution and change in len(numbers)
+    plt.clf()
     plt.hist(numbers, bins=20, range=range, density=True)
     plt.xlabel('Random Variable')
     plt.ylabel('Fraction of num of hits')
     plt.title(f'Sampling from {cfg.dist_type} Distribution: {cfg.num_pts} samples')
-    # print(numbers)
 
     plt.savefig(pathlib.Path(f"{hydra.utils.get_original_cwd()}/figs/ques1_{cfg.dist_type}_{cfg.num_pts}.png"))
 
