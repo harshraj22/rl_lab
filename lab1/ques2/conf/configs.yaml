@@ -1,0 +1,4 @@
+mean: 5
+variance: 9
+num_samples: 10_000
+seed: 3
