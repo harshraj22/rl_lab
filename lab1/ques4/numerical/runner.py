@@ -9,12 +9,12 @@ logger.setLevel(logging.INFO)
 np.set_printoptions(linewidth=np.inf)
 
 if __name__ == '__main__':
-    initial_prob = np.zeros(9)
+    transition_probs = get_transition_probs()
+    initial_prob = np.zeros(transition_probs.shape[0])
     initial_prob[0] = 1
     probs_sum = 0
 
-    transition_probs = get_transition_probs()
-    current_prob = np.identity(n = 9, like=transition_probs)
+    current_prob = np.identity(n=initial_prob.shape[0], like=transition_probs)
     INFINITY = 10**7
 
     for i in tqdm(range(INFINITY), desc='Summing prob of ending at 8th state in iteration'):

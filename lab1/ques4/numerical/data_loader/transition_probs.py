@@ -5,13 +5,13 @@ import unittest
 def get_transition_probs():
     """Retuns the probability distribution of the transition from one state to another
     for the given problem statement depending on the result of the roll of the die."""
-    # 9 states, and corresponding transition probabilities
+    # 10 states, and corresponding transition probabilities
 
     # In general, player remains in the same state iff the dice roll is 3, 4, 5, 6
-    same_place_prob = np.full(9, 4/6)
-    # state 8 is the terminal state, so all transitions from it go to itself
-    # from state 7, all rolls result in same state except 1
-    same_place_prob[7:] = [5/6, 1]
+    same_place_prob = np.full(10, 4/6)
+    # state 9 is the terminal state, so all transitions from it go to itself
+    # from state 7, all rolls result in same state except 1 (which moves to state 8)
+    same_place_prob[7:] = [5/6, 0, 1]
     P = np.diag(same_place_prob)
 
     # fill the general probability transitions
@@ -30,9 +30,10 @@ def get_transition_probs():
         if i+2 < 9:
             P[i,i+2] = 0
 
-    # from 8, let us assume we can not reach 8. This would help in calculating the probability of reaching 8
-    # only from other states
+    # from 8, let us assume we can not reach 8. This would help in calculating 
+    # the probability of reaching 8 only from other states
     P[8, 8] = 0
+    P[8, 9] = 1
 
     return P
 
@@ -43,9 +44,8 @@ class TestTransitionProbs(unittest.TestCase):
         cls.P = get_transition_probs()
 
     def test_row_sum_to_one(self):
-        """Each row should sum to 1. 
-        Note: It doesn't test the last row due to special condition that we defined."""
-        for row, _ in enumerate(self.P[:-1]):
+        """Each row should sum to 1."""
+        for row, _ in enumerate(self.P):
             self.assertAlmostEqual(self.P[row].sum(), 1)
 
     def test_all_items_are_probs(self):
