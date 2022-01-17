@@ -1,7 +1,12 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import pathlib
-from utils.utils import sqrt_sin, calculate_area
+from utils.utils import sqrt_sin, calculate_area, sqrt_sin_exp_minus_x2
+
+
+def print_areas(num_bins: int = 20_000) -> None:
+    print(f'Calculated Area of √sin(x) over [0, pi] is: {calculate_area(sqrt_sin, num_bins)}')
+    print(f'Calculated Area of √sin(x)exp(-x2) over [0, pi] is: {calculate_area(sqrt_sin_exp_minus_x2, num_bins)}')
 
 
 def main():
@@ -34,5 +39,4 @@ def main():
 
 if __name__ == "__main__":
     pathlib.Path(f'{pathlib.Path.cwd()}/figs/').mkdir(parents=True, exist_ok=True)
-    # main()
-    print('Approx Area: ', calculate_area(lambda x: 1, num_bins=2))
+    main()
