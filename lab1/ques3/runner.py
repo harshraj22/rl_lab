@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import pathlib
 
 
 def main():
@@ -31,4 +32,5 @@ def main():
 
 
 if __name__ == "__main__":
+    pathlib.Path(f'{pathlib.Path.cwd()}/figs/').mkdir(parents=True, exist_ok=True)
     main()
