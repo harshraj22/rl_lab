@@ -2,3 +2,4 @@ numpy
 hydra-core
 matplotlib==3.5.1
 tqdm
+gym
