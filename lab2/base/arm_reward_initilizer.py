@@ -4,7 +4,7 @@ from typing import List, Tuple
 
 class ArmRewardInitilizer(ABC):
     @abstractmethod
-    def initialize(self, num_arms: int) -> Tuple[List, int]:
+    def __call__(self, num_arms: int) -> Tuple[List, int]:
         """Initialize the arms with the reward setting and return the optimal
         arm index.
 
