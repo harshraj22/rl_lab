@@ -18,5 +18,8 @@ class RunningMean:
         self.count += 1
 
     def __str__(self) -> str:
-        return f'Mean: {self.mean}'
+        return f'Mean: {self.mean:.3f}'
+
+    def __repr__(self) -> str:
+        return self.__str__()
         

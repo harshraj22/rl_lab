@@ -13,7 +13,7 @@ from models.epsilon_greedy import EpsilonGreedyAgent
 def main(cfg):
     # np.random.seed(cfg.seed)
     env = MultiArmBanditEnvironment(arm_initializer=BanditArmRewardInitializer('binomial'))
-    agent = EpsilonGreedyAgent(0.3, env.num_arms) #, initial_temp=1.0, decay_factor=0.99)
+    agent = EpsilonGreedyAgent(0.3, env.num_arms, initial_temp=1.0, decay_factor=1.001)
 
     obs = env.reset()
     for _ in range(5000):
@@ -21,6 +21,7 @@ def main(cfg):
         obs, reward, done, info = env.step(action)
         agent.update_mean(action, reward)
         print(f"obs: {obs}, reward: {reward}, done: {done}, info: {info}")
+        # print(f"agent.running_means: {agent.running_means}")
 
 
 if __name__ == '__main__':

@@ -31,7 +31,7 @@ class BanditArmRewardInitializer(ArmRewardInitilizer):
             index of the optimal arm.
         """
         if self.initializer_type == "binomial":
-            return [BinomialRewardDistribution(1.0/num_arms) for _ in range(num_arms)], 0
+            return [BinomialRewardDistribution(1.0/(arm_index+2)) for arm_index in range(num_arms)], 0
         else:
             raise ValueError(f"Initializer not found.") 
 
