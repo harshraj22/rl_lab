@@ -4,8 +4,6 @@ import sys
 from typing import Tuple, Callable
 
 
-
-
 class MultiArmBanditEnvironment(gym.Env):
     """A generic class for MultiArmBandit environments. The underlying reward
     for each arm is initialized by a function. The simulation can be run for a
