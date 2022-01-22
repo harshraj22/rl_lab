@@ -6,6 +6,7 @@ from tqdm import tqdm
 from data_loader.environments import MultiArmBanditEnvironment
 from data_loader.bandit_arm_reward_initializer import BanditArmRewardInitializer
 from models.epsilon_greedy import EpsilonGreedyAgent
+from models.ucb import UCBAgent
 from models.softmax import SoftmaxAgent
 
 
@@ -15,7 +16,8 @@ def main(cfg):
     # np.random.seed(cfg.seed)
     env = MultiArmBanditEnvironment(arm_initializer=BanditArmRewardInitializer('binomial'), num_arms=cfg.env.num_arms)
     # agent = EpsilonGreedyAgent(0.3, env.num_arms, initial_temp=1.0, decay_factor=1.001)
-    agent = SoftmaxAgent(env.num_arms)
+    # agent = SoftmaxAgent(env.num_arms)
+    agent = UCBAgent(env.num_arms)
 
     obs = env.reset()
     for _ in range(5000):
