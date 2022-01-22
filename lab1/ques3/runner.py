@@ -9,6 +9,27 @@ def print_areas(num_bins: int = 20_000) -> None:
     print(f'Calculated Area of √sin(x)exp(-x2) over [0, pi] is: {calculate_area(sqrt_sin_exp_minus_x2, num_bins)}')
 
 
+def print_areas_using_sampling():
+    """Uses sampling method to print the areas of the functions"""
+    # ------- Part A ---------
+    num_samples = 10**4
+    current_sum = 0
+    for _ in range(num_samples):
+        x = np.random.uniform(0, np.pi)
+        current_sum += sqrt_sin(x)
+    print(f'Area of √sin(x) over [0, pi] by sampling is: {current_sum / num_samples:.3f}')
+
+
+    # ------- Part B ---------
+    num_samples = 10**4
+    current_sum = 0
+    for _ in range(num_samples):
+        x = abs(np.random.normal(0, 1/np.sqrt(2)))
+        x = np.clip(x, 0, np.pi)
+        current_sum += sqrt_sin_exp_minus_x2(x)
+    print(f'Area of √sin(x)exp(-x2) over [0, pi] by sampling is: {current_sum / num_samples:.3f}')
+
+
 def main():
     # ------- Part A -------
     x = np.linspace(0, np.pi, 60)

@@ -15,17 +15,33 @@ def generate_data_point(sample_size: int = 10) -> int:
     samples = np.random.uniform(0, 1, sample_size)
     return samples.mean()
 
-
-@hydra.main(config_path="conf", config_name="configs")
-def main(cfg):
-    np.random.seed(cfg.seed)
-    data_points = [generate_data_point(100) for _ in range(cfg.num_samples)]
+def generate_using_CLT(num_samples: int, mean: float, variance: float):
+    # np.random.seed(cfg.seed)
+    data_points = [generate_data_point(100) for _ in range(num_samples)]
     data_points = np.array(data_points)
 
     data_points = (data_points - data_points.mean()) / data_points.std()
 
-    std = np.sqrt(cfg.variance)
-    data_points = data_points * std + cfg.mean
+    std = np.sqrt(variance)
+    data_points = data_points * std + mean
+
+    return data_points
+
+
+def generate_using_Box_Muller_Transform(num_samples: int, mean: float, variance: float):
+    data_points = []
+    for _ in range(num_samples // 2):
+        u1, u2 = np.random.uniform(0, 1), np.random.uniform(0, 1)
+        x1 = np.cos(2 * np.pi * u2) * np.sqrt(-2 * np.log(u1))
+        x2 = np.sin(2 * np.pi * u2) * np.sqrt(-2 * np.log(u1))
+        data_points.extend([x1, x2])
+
+    return data_points
+
+
+@hydra.main(config_path="conf", config_name="configs")
+def main(cfg):
+    data_points = generate_using_CLT(cfg.num_samples, cfg.mean, cfg.variance)
 
     logger.info(f'Mean: {data_points.mean():.3f}, Std: {data_points.std():.3f}')
 
