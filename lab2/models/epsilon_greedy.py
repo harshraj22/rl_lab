@@ -33,9 +33,9 @@ class EpsilonGreedyAgent(MultiArmBanditAgent):
         self.decay_factor = decay_factor
         self.running_means = [RunningMean() for _ in range(num_arms)]
 
-    def update_mean(self, action: int, reward: int) -> None:
-        """Update the running mean of the selected action."""
-        self.running_means[action].update_mean(reward)
+    def update_mean(self, arm_index: int, reward: int) -> None:
+        """Update the running mean of the selected arm_index."""
+        self.running_means[arm_index].update_mean(reward)
 
     def forward(self, state: int, eps: float) -> int:
         """Select an action.

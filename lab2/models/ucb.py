@@ -29,8 +29,8 @@ class UCBAgent(MultiArmBanditAgent):
         self.num_arms = num_arms
         self.running_means = [RunningMeanUCB() for _ in range(num_arms)]
 
-    def update_mean(self, action: int, reward: int) -> None:
-        self.running_means[action].update_mean(reward)
+    def update_mean(self, arm_index: int, reward: int) -> None:
+        self.running_means[arm_index].update_mean(reward)
 
     def forward(self, state: int) -> int:
         """Select an action using the UCB over the estimated means and the bonus
