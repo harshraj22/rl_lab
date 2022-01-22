@@ -30,12 +30,13 @@ def generate_using_CLT(num_samples: int, mean: float, variance: float):
 
 def generate_using_Box_Muller_Transform(num_samples: int, mean: float, variance: float):
     data_points = []
+    std = np.sqrt(variance)
     for _ in range(num_samples // 2):
         u1, u2 = np.random.uniform(0, 1), np.random.uniform(0, 1)
         x1 = np.cos(2 * np.pi * u2) * np.sqrt(-2 * np.log(u1))
         x2 = np.sin(2 * np.pi * u2) * np.sqrt(-2 * np.log(u1))
-        x1 = x1 * variance + mean
-        x2 = x2 * variance + mean
+        x1 = x1 * std + mean
+        x2 = x2 * std + mean
         data_points.extend([x1, x2])
 
     return data_points
