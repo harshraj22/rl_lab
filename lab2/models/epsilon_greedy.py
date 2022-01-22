@@ -3,9 +3,10 @@ import sys
 
 sys.path.insert(0, '../')
 from utils.utils import RunningMean
+from base.multi_arm_bandit_agent import MultiArmBanditAgent
 
 
-class EpsilonGreedyAgent:
+class EpsilonGreedyAgent(MultiArmBanditAgent):
 
     def __init__(self, eps: float, num_arms: int, initial_temp: int = None, decay_factor: float=1.0) -> None:
         """Epsilon greedy agent. The agent selects an action randomly with probability eps,
@@ -25,6 +26,7 @@ class EpsilonGreedyAgent:
             The multiplicant to be multiplied with the temprature each time the
             agent selects an action, by default 1.0
         """
+        super(EpsilonGreedyAgent, self).__init__()
         self.eps = eps
         self.num_arms = num_arms
         self.current_temp = initial_temp

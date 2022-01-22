@@ -3,9 +3,11 @@ import sys
 from typing import List
 import logging
 from math import inf
+from data_loader.environments import MultiArmBanditEnvironment
 
 sys.path.insert(0, '../')
 from utils.utils import RunningMean
+from base.multi_arm_bandit_agent import MultiArmBanditAgent
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -16,7 +18,7 @@ def softmax(x: List[float]) -> List[float]:
     return np.exp(x) / np.sum(np.exp(x), axis=0)
 
 
-class SoftmaxAgent:
+class SoftmaxAgent(MultiArmBanditAgent):
 
     def __init__(self, num_arms: int, initial_temp: int = 1000, decay_factor: float=0.9) -> None:
         """Softmax agent. The agent selects an action greedily with arm probabilities
@@ -37,6 +39,7 @@ class SoftmaxAgent:
             agent selects an action, by default 0.9
             T_new = T_old * decay_factor
         """
+        super(SoftmaxAgent, self).__init__()
         self.num_arms = num_arms
         self.current_temp = initial_temp
         self.decay_factor = decay_factor
