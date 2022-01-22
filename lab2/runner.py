@@ -12,7 +12,7 @@ from models.epsilon_greedy import EpsilonGreedyAgent
 @hydra.main(config_path="conf", config_name="config")
 def main(cfg):
     # np.random.seed(cfg.seed)
-    env = MultiArmBanditEnvironment(arm_initializer=BanditArmRewardInitializer('binomial'))
+    env = MultiArmBanditEnvironment(arm_initializer=BanditArmRewardInitializer('binomial'), num_arms=cfg.env.num_arms)
     agent = EpsilonGreedyAgent(0.3, env.num_arms, initial_temp=1.0, decay_factor=1.001)
 
     obs = env.reset()
