@@ -27,7 +27,7 @@ def main():
     x = np.linspace(0, np.pi, 60)
     sin_x = np.sin(x)
     sqrt_sin_x = np.sqrt(sin_x)
-    exp_minus_x2 = -np.exp(x**2)
+    exp_minus_x2 = np.exp(-1 * x**2)
 
     plt.plot(x, sqrt_sin_x * exp_minus_x2)
     plt.title('x vs √sin(x)exp(-x2)')
