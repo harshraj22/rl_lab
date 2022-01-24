@@ -47,3 +47,24 @@ class RunningMeanUCB(RunningMean):
         if self.count > 0:
             self.bonus = np.sqrt(2 * np.log(self.time) / self.count)
 
+
+class RunningMeanThompson(RunningMean):
+    """Class to store and update the alpha and beta values for the Thompson
+    Sampling using Beta distribution. The reward distribution is assumed to be
+    binomial."""
+    
+    def __init__(self):
+        super(RunningMeanThompson, self).__init__()
+        self.alpha = 1
+        self.beta = 1
+
+    def update_mean(self, reward: int) -> None:
+        self.alpha += int(reward == 1)
+        self.beta += int(reward == 0)
+
+        super(RunningMeanThompson, self).update_mean(reward)
+
+    @property
+    def priority(self) -> float:
+        return np.random.beta(self.alpha, self.beta)
+
