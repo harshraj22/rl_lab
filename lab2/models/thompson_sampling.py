@@ -15,7 +15,10 @@ class ThompsonSamplingAgent(MultiArmBanditAgent):
 
     def __init__(self, num_arms: int) -> None:
         """Thompson Sampling Agent. The agent selects an action using a random
-        draw from a Beta distribution.
+        draw from a Beta distribution. The distribution is updated each time the
+        arm is selected. The initial exploration comes from the initialization
+        of the Beta distribution with alpha = 1 and beta = 1. As the time progresses
+        the agent explores and adjusts alpha and beta accordingly.
 
         Parameters
         ----------
