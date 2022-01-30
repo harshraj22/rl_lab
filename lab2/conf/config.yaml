@@ -1,3 +1,4 @@
 seed: 5
+total_timesteps: 5000
 env:
   num_arms: 3
