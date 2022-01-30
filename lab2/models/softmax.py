@@ -67,3 +67,9 @@ class SoftmaxAgent(MultiArmBanditAgent):
         self.current_temp = np.clip(self.current_temp * self.decay_factor, 0.001, inf)
         action = self.forward(state)
         return action
+
+    def __str__(self):
+        return f'SoftmaxAgent(arms={self.num_arms})'
+
+    def __repr__(self) -> str:
+        return self.__str__()

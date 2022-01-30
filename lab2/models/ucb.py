@@ -44,4 +44,7 @@ class UCBAgent(MultiArmBanditAgent):
         return action
 
     def __str__(self) -> str:
-        return 'UCB Agent'
+        return f'UCBAgent(arms={self.num_arms})'
+
+    def __repr__(self) -> str:
+        return self.__str__()

@@ -16,6 +16,7 @@ class ReinforceAgent(MultiArmBanditAgent):
     def __init__(self, num_arms: int, baseline: bool = True) -> None:
         super(ReinforceAgent, self).__init__()
         self.num_arms = num_arms
+        self.baseline = baseline
         self.running_means = [RunningMeanReinforce(baseline=baseline) for _ in range(num_arms)]
 
     def update_mean(self, arm_index: int, reward: int) -> None:
@@ -32,3 +33,8 @@ class ReinforceAgent(MultiArmBanditAgent):
         action = self.forward(state)
         return action
     
+    def __str__(self):
+        return f'ReinforceAgent(arms={self.num_arms}, baseline={self.baseline})'
+
+    def __repr__(self) -> str:
+        return self.__str__()

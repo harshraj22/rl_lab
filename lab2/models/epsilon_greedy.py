@@ -69,3 +69,9 @@ class EpsilonGreedyAgent(MultiArmBanditAgent):
         action = self.forward(state, eps)
 
         return action
+
+    def __str__(self) -> str:
+        return f'EpsilonGreedyAgent(eps={self.eps}, arms={self.num_arms})'
+
+    def __repr__(self) -> str:
+        return self.__str__()

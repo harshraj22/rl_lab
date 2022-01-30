@@ -40,3 +40,8 @@ class ThompsonSamplingAgent(MultiArmBanditAgent):
         action = self.forward(state)
         return action
     
+    def __str__(self) -> str:
+        return f'ThompsonSamplingAgent(arms={self.num_arms})'
+    
+    def __repr__(self) -> str:
+        return self.__str__()
