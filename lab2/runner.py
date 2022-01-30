@@ -5,12 +5,7 @@ from tqdm import tqdm
 
 from data_loader.environments import MultiArmBanditEnvironment
 from data_loader.bandit_arm_reward_initializer import BanditArmRewardInitializer
-from models.epsilon_greedy import EpsilonGreedyAgent
-from models.ucb import UCBAgent
-from models.thompson_sampling import ThompsonSamplingAgent
-from models.softmax import SoftmaxAgent
-from models.reinforce import ReinforceAgent
-
+from models import ReinforceAgent, EpsilonGreedyAgent, UCBAgent, ThompsonSamplingAgent, SoftmaxAgent
 
 
 @hydra.main(config_path="conf", config_name="config")
