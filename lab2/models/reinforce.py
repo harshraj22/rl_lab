@@ -13,10 +13,10 @@ logger.setLevel(logging.INFO)
 
 class ReinforceAgent(MultiArmBanditAgent):
 
-    def __init__(self, num_arms: int) -> None:
+    def __init__(self, num_arms: int, baseline: bool = True) -> None:
         super(ReinforceAgent, self).__init__()
         self.num_arms = num_arms
-        self.running_means = [RunningMeanReinforce() for _ in range(num_arms)]
+        self.running_means = [RunningMeanReinforce(baseline=baseline) for _ in range(num_arms)]
 
     def update_mean(self, arm_index: int, reward: int) -> None:
         self.running_means[arm_index].update_preference(reward)

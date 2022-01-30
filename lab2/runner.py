@@ -21,7 +21,7 @@ def main(cfg):
     # agent = SoftmaxAgent(env.num_arms)
     # agent = UCBAgent(env.num_arms)
     # agent = ThompsonSamplingAgent(env.num_arms)
-    agent = ReinforceAgent(env.num_arms)
+    agent = ReinforceAgent(env.num_arms, baseline=False)
 
     obs = env.reset()
     for _ in range(5000):
