@@ -1,2 +1,3 @@
+seed: 5
 env:
   num_arms: 3
