@@ -1,7 +1,7 @@
 ## Study of Various Multi Arm Bandits algorithms, and affect of various parameters on final Regret
 
 
-<!- Plots to be added here ->
+<img src="https://user-images.githubusercontent.com/46635452/151704717-6d719c1a-51f7-4b79-b865-98a319bff265.png">
 
 
 To run the code:         
@@ -9,7 +9,7 @@ To run the code:
 2. run the code using `python runner.py`
 
 Note: The script uses [hydra](https://github.com/facebookresearch/hydra) for configuration management.
-To alter the configuration settings, either edit the `conf/config.yaml` file or use the command line as `python3 runner.py seed=5`.
+To alter the configuration settings, either edit the `conf/config.yaml` file or use the command line as `python3 runner.py seed=5`. The visualization is done using [wandb](https://wandb.ai/harshraj22/multi_arm_bandit)
 
 
 See the [contributing](docs/contributing.md) file for more details regarding extending the code or adding more Agents.
