@@ -1,6 +1,12 @@
 
 import numpy as np
 from math import inf
+from typing import List
+
+
+def softmax(x: List[float]) -> List[float]:
+    """Compute softmax values for each sets of scores in x."""
+    return np.exp(x) / np.sum(np.exp(x), axis=0)
 
 
 class RunningMean:
@@ -55,6 +61,10 @@ class RunningMeanThompson(RunningMean):
     
     def __init__(self):
         super(RunningMeanThompson, self).__init__()
+        """ Set the initial alpha and beta values to 1. These correspond to the
+        arguments of the beta distribution. Initial value of 1 is chosen to
+        set the initial distribution as uniform, ie. no prior knowledge about
+        the underlying reward distribution.  """
         self.alpha = 1
         self.beta = 1
 
@@ -68,3 +78,49 @@ class RunningMeanThompson(RunningMean):
     def priority(self) -> float:
         return np.random.beta(self.alpha, self.beta)
 
+
+class RunningMeanReinforce(RunningMean):
+    """Class to store running mean and preference for the REINFORCE agent."""
+    def __init__(self, alpha: float = 0.5, beta: float = 0.5, baseline: bool = True):
+        """Initialize the class. The agent choses the arm with the highest preference.
+        The preference is updated every time the agent selects the corresponding
+        arm and recieves a reward. Running mean is maintained to implement the 
+        baseline.
+
+        Parameters
+        ----------
+        alpha : float
+            Rate at which the running mean of rewrads is updated.
+        beta : float
+            Rate at which the preference is updated.
+        baseline : bool
+            Whether to use the baseline or not.
+        """
+        super(RunningMeanReinforce, self).__init__()
+
+        self.running_mean_reward = 0
+        self.alpha = alpha
+        self.beta = beta
+        self._preference = 0.0
+        self.baseline = baseline
+
+    @property
+    def mean(self) -> float:
+        return self.running_mean_reward
+
+    @property
+    def preference(self) -> float:
+        return self._preference
+
+    def update_mean(self, reward: int) -> None:
+        self.running_mean_reward = (1-self.alpha) * self.running_mean_reward + self.alpha * reward
+
+    def update_preference(self, reward: int) -> None:
+        self._preference = self._preference + self.beta * (reward - (self.mean if self.baseline else 0))
+
+    def __str__(self) -> str:
+        return f'Mean: {self.mean:.3f}, Preference: {self.preference:.3f}'
+
+    def __repr__(self) -> str:
+        return self.__str__()
+    

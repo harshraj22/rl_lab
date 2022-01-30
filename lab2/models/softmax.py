@@ -6,16 +6,12 @@ from math import inf
 from data_loader.environments import MultiArmBanditEnvironment
 
 sys.path.insert(0, '../')
-from utils.utils import RunningMean
+from utils.utils import RunningMean, softmax
 from base.multi_arm_bandit_agent import MultiArmBanditAgent
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
-
-def softmax(x: List[float]) -> List[float]:
-    """Compute softmax values for each sets of scores in x."""
-    return np.exp(x) / np.sum(np.exp(x), axis=0)
 
 
 class SoftmaxAgent(MultiArmBanditAgent):

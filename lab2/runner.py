@@ -9,6 +9,7 @@ from models.epsilon_greedy import EpsilonGreedyAgent
 from models.ucb import UCBAgent
 from models.thompson_sampling import ThompsonSamplingAgent
 from models.softmax import SoftmaxAgent
+from models.reinforce import ReinforceAgent
 
 
 
@@ -19,14 +20,15 @@ def main(cfg):
     # agent = EpsilonGreedyAgent(0.3, env.num_arms, initial_temp=1.0, decay_factor=1.001)
     # agent = SoftmaxAgent(env.num_arms)
     # agent = UCBAgent(env.num_arms)
-    agent = ThompsonSamplingAgent(env.num_arms)
+    # agent = ThompsonSamplingAgent(env.num_arms)
+    agent = ReinforceAgent(env.num_arms)
 
     obs = env.reset()
-    for _ in range(5000):
+    for _ in range(5):
         action = agent(obs)
         obs, reward, done, info = env.step(action)
         agent.update_mean(action, reward)
-        print(f"obs: {obs}, reward: {reward}, done: {done}, info: {info}")
+        print(f"obs: {obs}, reward: {reward}, done: {done}, info: {info}, agent: {agent.__class__.__name__}")
         # print(f"agent.running_means: {agent.running_means}")
 
 
