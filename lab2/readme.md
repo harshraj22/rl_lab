@@ -25,8 +25,6 @@ Directory Structure:
 ├── conf                         <- Config files
 │   └── config.yaml
 ├── data_loader                  <- classes for creating the MultiArmBandit environment      
-│   ├── __pycache__
-│   │   └── environments.cpython-39.pyc
 │   ├── bandit_arm_reward_initializer.py
 │   ├── environments.py
 │   └── probablistic_reward_distributions.py
