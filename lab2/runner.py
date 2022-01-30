@@ -24,7 +24,7 @@ def main(cfg):
     agent = ReinforceAgent(env.num_arms)
 
     obs = env.reset()
-    for _ in range(5):
+    for _ in range(5000):
         action = agent(obs)
         obs, reward, done, info = env.step(action)
         agent.update_mean(action, reward)
