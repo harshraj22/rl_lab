@@ -98,7 +98,7 @@ class RunningMeanReinforce(RunningMean):
         """
         super(RunningMeanReinforce, self).__init__()
 
-        self.running_mean_reward = 0
+        self.running_mean_reward = 1
         self.alpha = alpha
         self.beta = beta
         self._preference = 0.0
