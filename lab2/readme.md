@@ -1,14 +1,15 @@
+## Study of Various Multi Arm Bandits algorithms, and affect of various parameters on final Regret
 
 
+<!- Plots to be added here ->
 
-### Adding a new reward distribution
-In order to add a new reward distribution, you need to:
-1. Create a new class that inherits from the `RewardDistribution` class. It should define how the reward is distributed for each arm.
-2. Update the `__call__` method of the `BanditArmRewardInitializer` class to include the new reward distribution.
-3. Use the new reward distribution as follows:
-```python
-from data_loader.environments import MultiArmBanditEnvironment
-from data_loader.bandit_arm_reward_initializer import BanditArmRewardInitializer
 
-env = MultiArmBanditEnvironment(arm_initializer=BanditArmRewardInitializer('new-distribution'))
-```
+To run the code:         
+1. install the dependencies using `pip install -r requirements.txt`
+2. run the code using `python runner.py`
+
+Note: The script uses [hydra](https://github.com/facebookresearch/hydra) for configuration management.
+To alter the configuration settings, either edit the `conf/config.yaml` file or use the command line as `python3 runner.py seed=5`.
+
+
+See the [contributing](docs/contributing.md) file for more details regarding extending the code or adding more Agents.
