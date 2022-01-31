@@ -59,7 +59,8 @@ class SoftmaxAgent(MultiArmBanditAgent):
         int
             The index of the arm selected.
         """
-        arm_selection_probs = softmax([mean.mean / self.current_temp for mean in self.running_means])
+        arm_selection_probs = softmax([
+            np.clip(mean.mean / self.current_temp, 0.001, 700) for mean in self.running_means])
         action = np.random.choice(self.num_arms, p=arm_selection_probs)
         return action
 
