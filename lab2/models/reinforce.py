@@ -26,7 +26,7 @@ class ReinforceAgent(MultiArmBanditAgent):
         """Choose the arm whose probability is maximum. The probability is calculated
         by taking softmax of the preferences of all arms."""
         pi = softmax([mean.preference for mean in self.running_means])
-        logger.info(f'pi: {pi}, sum: {np.sum(pi)}')
+        # logger.info(f'pi: {pi}, sum: {np.sum(pi)}')
         return np.random.choice(self.num_arms, 1, p=pi)[0]
 
     def __call__(self, state: int) -> int:

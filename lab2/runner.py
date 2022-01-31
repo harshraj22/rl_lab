@@ -11,7 +11,7 @@ from data_loader.bandit_arm_reward_initializer import BanditArmRewardInitializer
 from models import ReinforceAgent, EpsilonGreedyAgent, UCBAgent, ThompsonSamplingAgent, SoftmaxAgent
 
 
-wandb_run = wandb.init(project="multi_arm_bandit", entity="harshraj22") #, mode="disabled")
+wandb_run = wandb.init(project="multi_arm_bandit", entity="harshraj22", mode="disabled")
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -25,7 +25,7 @@ logger.propagate = False
 
 @hydra.main(config_path="conf", config_name="config")
 def main(cfg):
-    np.random.seed(cfg.seed)
+    # np.random.seed(cfg.seed)
 
     env = MultiArmBanditEnvironment(
         arm_initializer=BanditArmRewardInitializer('binomial'), 
@@ -36,7 +36,7 @@ def main(cfg):
     # agent = SoftmaxAgent(env.num_arms)
     # agent = UCBAgent(env.num_arms)
     # agent = ThompsonSamplingAgent(env.num_arms)
-    agent = ReinforceAgent(env.num_arms, baseline=True)
+    agent = ReinforceAgent(env.num_arms, baseline=False)
 
     wandb_run.name = str(agent)
 
@@ -48,8 +48,8 @@ def main(cfg):
         wandb.log({
             "optimal_arm_percentage": info['optimal_arm_hits'] / chance
         })
-        logger.info(f"obs: {obs}, reward: {reward}, done: {done}, info: {info}, agent: {agent.__class__.__name__}")
-
+        # logger.info(f"obs: {obs}, reward: {reward}, done: {done}, info: {info}, agent: {agent.__class__.__name__}")
+    logger.info(f"info: {info}")
 
 if __name__ == '__main__':
     # pathlib.Path(f'{pathlib.Path.cwd()}/figs/').mkdir(parents=True, exist_ok=True)
