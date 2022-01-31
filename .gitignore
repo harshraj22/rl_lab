@@ -1,5 +1,6 @@
 **/outputs
 **/wandb/
+**/multirun/
 **/figs/*.png
 
 # Ignore Mac DS_Store files
