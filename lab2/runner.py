@@ -25,18 +25,18 @@ logger.propagate = False
 
 @hydra.main(config_path="conf", config_name="config")
 def main(cfg):
-    # np.random.seed(cfg.seed)
+    np.random.seed(cfg.seed)
 
     env = MultiArmBanditEnvironment(
-        arm_initializer=BanditArmRewardInitializer('binomial'), 
+        arm_initializer=BanditArmRewardInitializer('gaussian'),
         num_arms=cfg.env.num_arms,
         total_timesteps=cfg.total_timesteps
         )
     # agent = EpsilonGreedyAgent(0.3, env.num_arms, initial_temp=1.0, decay_factor=1.001)
     # agent = SoftmaxAgent(env.num_arms)
     # agent = UCBAgent(env.num_arms)
-    # agent = ThompsonSamplingAgent(env.num_arms)
-    agent = ReinforceAgent(env.num_arms, baseline=False)
+    agent = ThompsonSamplingAgent(env.num_arms, underlying_dist='gaussian')
+    # agent = ReinforceAgent(env.num_arms, baseline=True)
 
     wandb_run.name = str(agent)
 

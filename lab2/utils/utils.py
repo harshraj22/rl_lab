@@ -52,13 +52,13 @@ class RunningMeanUCB(RunningMean):
             self.bonus = np.sqrt(2 * np.log(self.time) / self.count)
 
 
-class RunningMeanThompson(RunningMean):
+class RunningMeanThompsonBeta(RunningMean):
     """Class to store and update the alpha and beta values for the Thompson
     Sampling using Beta distribution. The reward distribution is assumed to be
     binomial."""
 
     def __init__(self):
-        super(RunningMeanThompson, self).__init__()
+        super(RunningMeanThompsonBeta, self).__init__()
         """ Set the initial alpha and beta values to 1. These correspond to the
         arguments of the beta distribution. Initial value of 1 is chosen to
         set the initial distribution as uniform, ie. no prior knowledge about
@@ -70,11 +70,41 @@ class RunningMeanThompson(RunningMean):
         self.alpha += int(reward == 1)
         self.beta += int(reward == 0)
 
-        super(RunningMeanThompson, self).update_mean(reward)
+        super(RunningMeanThompsonBeta, self).update_mean(reward)
 
     @property
     def priority(self) -> float:
         return np.random.beta(self.alpha, self.beta)
+
+
+class RunningMeanThompsonGaussian(RunningMean):
+    def __init__(self):
+        super(RunningMeanThompsonGaussian, self).__init__()
+        self.mu = 0
+        self.sigma = 1
+
+    @property
+    def mean(self) -> float:
+        return self.mu
+
+    def update_mean(self, reward: int) -> None:
+        # https://stackoverflow.com/a/50729600/10127204
+        N = self.count + 1
+        rho = 1.0 / N
+        d = reward - self.mu
+        self.mu += rho * d
+        self.sigma += rho * ((1-rho)* d**2 - self.sigma)
+        self.sigma = np.clip(self.sigma, 0.001, 10_000)
+        super(RunningMeanThompsonGaussian, self).update_mean(reward)
+
+    @property
+    def priority(self) -> float:
+        # Assuming initial mean=0, sigma=1
+        # Following point 2 from bayesNormal.pdf
+        initial_mean, initial_std = 0, 1
+        std_sq = 1.0 / np.clip((1.0 / initial_std**2 + self.count / self.sigma**2), 0.001, 10_000)
+        new_mean = std_sq * (initial_mean / initial_std**2 + self.mean*self.count / self.sigma**2)
+        return np.random.normal(new_mean, std_sq, 1).item()
 
 
 class RunningMeanReinforce(RunningMean):

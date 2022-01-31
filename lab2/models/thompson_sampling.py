@@ -4,7 +4,7 @@ import logging
 from math import inf
 
 sys.path.insert(0, '../')
-from utils.utils import RunningMeanThompson
+from utils.utils import RunningMeanThompsonBeta, RunningMeanThompsonGaussian
 from base.multi_arm_bandit_agent import MultiArmBanditAgent
 
 logger = logging.getLogger(__name__)
@@ -13,7 +13,7 @@ logger.setLevel(logging.INFO)
 
 class ThompsonSamplingAgent(MultiArmBanditAgent):
 
-    def __init__(self, num_arms: int) -> None:
+    def __init__(self, num_arms: int, underlying_dist: str = 'beta') -> None:
         """Thompson Sampling Agent. The agent selects an action using a random
         draw from a Beta distribution. The distribution is updated each time the
         arm is selected. The initial exploration comes from the initialization
@@ -27,7 +27,13 @@ class ThompsonSamplingAgent(MultiArmBanditAgent):
         """
         super(ThompsonSamplingAgent, self).__init__()
         self.num_arms = num_arms
-        self.running_means = [RunningMeanThompson() for _ in range(num_arms)]
+        if underlying_dist == 'beta':
+            RunningMean = RunningMeanThompsonBeta
+        elif underlying_dist == 'gaussian':
+            RunningMean = RunningMeanThompsonGaussian
+        else:
+            raise ValueError(f'Unknown underlying distribution {underlying_dist}')
+        self.running_means = [RunningMean() for _ in range(num_arms)]
 
     def update_mean(self, arm_index: int, reward: int) -> None:
         self.running_means[arm_index].update_mean(reward)
