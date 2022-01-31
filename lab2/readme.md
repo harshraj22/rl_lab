@@ -1,7 +1,7 @@
 ## Study of Various Multi Arm Bandits algorithms, and affect of various parameters on final Regret
 
 
-<img src="https://user-images.githubusercontent.com/46635452/151704717-6d719c1a-51f7-4b79-b865-98a319bff265.png">
+<img src="https://user-images.githubusercontent.com/46635452/151768372-0d2976a7-715e-4623-8bdd-2b86856e95c8.png">
 
 
 To run the code:         
