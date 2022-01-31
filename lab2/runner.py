@@ -11,7 +11,7 @@ from data_loader.bandit_arm_reward_initializer import BanditArmRewardInitializer
 from models import ReinforceAgent, EpsilonGreedyAgent, UCBAgent, ThompsonSamplingAgent, SoftmaxAgent
 
 
-wandb_run = wandb.init(project="multi_arm_bandit", entity="harshraj22", mode="disabled")
+wandb_run = wandb.init(project="multi_arm_bandit", entity="harshraj22") #, mode="disabled")
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)

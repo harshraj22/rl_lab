@@ -81,7 +81,7 @@ class RunningMeanThompson(RunningMean):
 
 class RunningMeanReinforce(RunningMean):
     """Class to store running mean and preference for the REINFORCE agent."""
-    def __init__(self, alpha: float = 0.8, beta: float = 0.1, baseline: bool = True):
+    def __init__(self, alpha: float = 0.8, beta: float = 0.3, baseline: bool = True):
         """Initialize the class. The agent choses the arm with the highest preference.
         The preference is updated every time the agent selects the corresponding
         arm and recieves a reward. Running mean is maintained to implement the 
@@ -99,22 +99,25 @@ class RunningMeanReinforce(RunningMean):
         """
         super(RunningMeanReinforce, self).__init__()
 
-        self.running_mean_reward = 1
+        self.running_mean_reward = 0
         self.alpha = alpha
         self.beta = beta
         self._preference = 0.0
         self.baseline = baseline
+        self.times_selected = 1
 
     @property
     def mean(self) -> float:
-        return self.running_mean_reward
+        return self.running_mean_reward / self.times_selected
 
     @property
     def preference(self) -> float:
         return self._preference
 
     def update_mean(self, reward: int) -> None:
-        self.running_mean_reward = (1-self.alpha) * self.running_mean_reward + self.alpha * reward
+        # self.running_mean_reward = (1-self.alpha) * self.running_mean_reward + self.alpha * reward
+        self.running_mean_reward += reward
+        self.times_selected += 1
 
     def update_preference(self, reward: int) -> None:
         self._preference = self._preference + self.beta * (reward - (self.mean if self.baseline else 0))
