@@ -26,7 +26,6 @@ logger.propagate = False
 @hydra.main(config_path="conf", config_name="config")
 def main(cfg):
     np.random.seed(cfg.seed)
-    # wandb_run.name = f'{np.random.randint(0, 500)}-Random'
 
     env = MultiArmBanditEnvironment(
         arm_initializer=BanditArmRewardInitializer('binomial'), 
@@ -50,7 +49,6 @@ def main(cfg):
             "optimal_arm_percentage": info['optimal_arm_hits'] / chance
         })
         logger.info(f"obs: {obs}, reward: {reward}, done: {done}, info: {info}, agent: {agent.__class__.__name__}")
-        # print(f"agent.running_means: {agent.running_means}")
 
 
 if __name__ == '__main__':

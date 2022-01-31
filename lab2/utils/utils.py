@@ -19,8 +19,7 @@ class RunningMean:
     def mean(self) -> float:
         if self.count == 0:
             return 0.0
-        else:
-            return self.total_reward / self.count
+        return self.total_reward / self.count
 
     def update_mean(self, reward: int) -> None:
         self.total_reward += reward
@@ -31,7 +30,7 @@ class RunningMean:
 
     def __repr__(self) -> str:
         return self.__str__()
-        
+
 
 class RunningMeanUCB(RunningMean):
     """Class to store and update the running mean and bonus term for the UCB
@@ -49,7 +48,6 @@ class RunningMeanUCB(RunningMean):
 
     def tick(self):
         self.time += 1
-
         if self.count > 0:
             self.bonus = np.sqrt(2 * np.log(self.time) / self.count)
 
@@ -58,7 +56,7 @@ class RunningMeanThompson(RunningMean):
     """Class to store and update the alpha and beta values for the Thompson
     Sampling using Beta distribution. The reward distribution is assumed to be
     binomial."""
-    
+
     def __init__(self):
         super(RunningMeanThompson, self).__init__()
         """ Set the initial alpha and beta values to 1. These correspond to the
@@ -84,7 +82,7 @@ class RunningMeanReinforce(RunningMean):
     def __init__(self, alpha: float = 0.8, beta: float = 0.3, baseline: bool = True):
         """Initialize the class. The agent choses the arm with the highest preference.
         The preference is updated every time the agent selects the corresponding
-        arm and recieves a reward. Running mean is maintained to implement the 
+        arm and recieves a reward. Running mean is maintained to implement the
         baseline.
 
         Parameters
@@ -112,6 +110,8 @@ class RunningMeanReinforce(RunningMean):
 
     @property
     def preference(self) -> float:
+        """Denotes the preference that should be used for the current arm, while
+        selecting the arm."""
         return self._preference
 
     def update_mean(self, reward: int) -> None:

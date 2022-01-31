@@ -1,7 +1,6 @@
 import numpy as np
 import sys
 import logging
-from math import inf
 
 sys.path.insert(0, '../')
 from utils.utils import RunningMeanReinforce, softmax
@@ -26,7 +25,6 @@ class ReinforceAgent(MultiArmBanditAgent):
     def forward(self, state: int) -> int:
         """Choose the arm whose probability is maximum. The probability is calculated
         by taking softmax of the preferences of all arms."""
-        # logger.error(f'{np.exp([mean.preference for mean in self.running_means])}')
         pi = softmax([mean.preference for mean in self.running_means])
         logger.info(f'pi: {pi}, sum: {np.sum(pi)}')
         return np.random.choice(self.num_arms, 1, p=pi)[0]
@@ -34,7 +32,7 @@ class ReinforceAgent(MultiArmBanditAgent):
     def __call__(self, state: int) -> int:
         action = self.forward(state)
         return action
-    
+
     def __str__(self):
         return f'ReinforceAgent(arms={self.num_arms}, baseline={self.baseline})'
 
