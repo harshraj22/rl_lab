@@ -1,7 +1,11 @@
-
 import numpy as np
 from math import inf
 from typing import List
+import logging
+
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 
 def softmax(x: List[float]) -> List[float]:
@@ -102,9 +106,11 @@ class RunningMeanThompsonGaussian(RunningMean):
         # Assuming initial mean=0, sigma=1
         # Following point 2 from bayesNormal.pdf
         initial_mean, initial_std = 0, 1
-        std_sq = 1.0 / np.clip((1.0 / initial_std**2 + self.count / self.sigma**2), 0.001, 10_000)
-        new_mean = std_sq * (initial_mean / initial_std**2 + self.mean*self.count / self.sigma**2)
-        return np.random.normal(new_mean, std_sq, 1).item()
+        # std_sq = 1.0 / np.clip((1.0 / initial_std**2 + self.count / self.sigma**2), 0.001, 10_000)
+        # new_mean = std_sq * (initial_mean / initial_std**2 + self.mean*self.count / self.sigma**2)
+        # logger.info(f'Mean: {new_mean:.3f}, std: {np.sqrt(std_sq):.3f} | {self.mu:.3f}, {self.sigma:.3f}')
+        # return np.random.normal(new_mean, std_sq, 1).item()
+        return np.random.normal(self.mu, self.sigma)
 
 
 class RunningMeanReinforce(RunningMean):
