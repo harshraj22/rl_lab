@@ -120,7 +120,7 @@ class RunningMeanThompsonGaussian(RunningMean):
 
 class RunningMeanReinforce(RunningMean):
     """Class to store running mean and preference for the REINFORCE agent."""
-    def __init__(self, alpha: float = 0.8, beta: float = 0.3, baseline: bool = True):
+    def __init__(self, beta: float = 0.3, baseline: bool = True):
         """Initialize the class. The agent choses the arm with the highest preference.
         The preference is updated every time the agent selects the corresponding
         arm and recieves a reward. Running mean is maintained to implement the
@@ -128,8 +128,6 @@ class RunningMeanReinforce(RunningMean):
 
         Parameters
         ----------
-        alpha : float
-            Rate at which the running mean of rewrads is updated.
         beta : float
             Rate at which the preference is updated. Low beta will be more robust
             to outliers, but will take more number of iterations to converge.

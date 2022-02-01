@@ -23,7 +23,7 @@ logger.propagate = False
 @hydra.main(config_path="conf", config_name="config")
 def main(cfg):
     wandb_run = wandb.init(project="multi_arm_bandit", entity="harshraj22", mode=cfg.wandb_tracking)
-    np.random.seed(cfg.seed)
+    # np.random.seed(cfg.seed)
 
     env = MultiArmBanditEnvironment(
         arm_initializer=BanditArmRewardInitializer(cfg.env.reward_dist),
