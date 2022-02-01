@@ -86,6 +86,7 @@ class RunningMeanThompsonGaussian(RunningMean):
         super(RunningMeanThompsonGaussian, self).__init__()
         self.mu = 0
         self.sigma = 1
+        self.rewards = [0]
 
     @property
     def mean(self) -> float:
@@ -93,12 +94,13 @@ class RunningMeanThompsonGaussian(RunningMean):
 
     def update_mean(self, reward: int) -> None:
         # https://stackoverflow.com/a/50729600/10127204
-        N = self.count + 1
-        rho = 1.0 / N
-        d = reward - self.mu
-        self.mu += rho * d
-        self.sigma += rho * ((1-rho)* d**2 - self.sigma)
-        self.sigma = np.clip(self.sigma, 0.001, 10_000)
+        # N = self.count + 1
+        # rho = 1.0 / N
+        # d = reward - self.mu
+        # self.mu += rho * d
+        # self.sigma += rho * ((1-rho)* d**2 - self.sigma)
+        # self.sigma = np.clip(self.sigma, 0.001, 10_000)
+        self.rewards.append(reward)
         super(RunningMeanThompsonGaussian, self).update_mean(reward)
 
     @property
@@ -106,10 +108,13 @@ class RunningMeanThompsonGaussian(RunningMean):
         # Assuming initial mean=0, sigma=1
         # Following point 2 from bayesNormal.pdf
         initial_mean, initial_std = 0, 1
-        # std_sq = 1.0 / np.clip((1.0 / initial_std**2 + self.count / self.sigma**2), 0.001, 10_000)
-        # new_mean = std_sq * (initial_mean / initial_std**2 + self.mean*self.count / self.sigma**2)
+        self.mu = np.mean(self.rewards)
+        self.sigma = np.std(self.rewards)
+
+        std_sq = 1.0 / np.clip((1.0 / initial_std**2 + self.count / self.sigma**2), 0.001, 10_000)
+        new_mean = std_sq * (initial_mean / initial_std**2 + self.mean*self.count / self.sigma**2)
         # logger.info(f'Mean: {new_mean:.3f}, std: {np.sqrt(std_sq):.3f} | {self.mu:.3f}, {self.sigma:.3f}')
-        # return np.random.normal(new_mean, std_sq, 1).item()
+        return np.random.normal(new_mean, np.sqrt(std_sq), 1).item()
         return np.random.normal(self.mu, self.sigma)
 
 
@@ -150,14 +155,14 @@ class RunningMeanReinforce(RunningMean):
         selecting the arm."""
         return self._preference
 
-    def update_mean(self, reward: int) -> None:
-        # self.running_mean_reward = (1-self.alpha) * self.running_mean_reward + self.alpha * reward
-        self.running_mean_reward += reward
-        self.times_selected += 1
+    def update_mean(self, reward: int, average_reward: float = 0.0) -> None:
+        self.running_mean_reward = (1-self.alpha) * average_reward + self.alpha * reward
+        # self.running_mean_reward += reward
+        # self.times_selected += 1
 
-    def update_preference(self, reward: int) -> None:
-        self._preference = self._preference + self.beta * (reward - (self.mean if self.baseline else 0))
-        self._preference = np.clip(self._preference, 0, 200)
+    def update_preference(self, reward: int, average_reward: float = 0.0) -> None:
+        self._preference = self._preference + self.beta * (reward - (average_reward if self.baseline else 0))
+        self._preference = np.clip(self._preference, 0, 700)
 
     def __str__(self) -> str:
         return f'Mean: {self.mean:.3f}, Preference: {self.preference:.3f}'
