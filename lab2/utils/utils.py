@@ -107,7 +107,7 @@ class RunningMeanThompsonGaussian(RunningMean):
     def priority(self) -> float:
         # Assuming initial mean=0, sigma=1
         # Following point 2 from bayesNormal.pdf
-        initial_mean, initial_std = 0, 1
+        initial_mean, initial_std = 0, 10000
         self.mu = np.mean(self.rewards)
         self.sigma = np.clip(np.std(self.rewards), 0.001, 10_000)
 
