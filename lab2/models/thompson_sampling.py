@@ -27,7 +27,7 @@ class ThompsonSamplingAgent(MultiArmBanditAgent):
         """
         super(ThompsonSamplingAgent, self).__init__()
         self.num_arms = num_arms
-        if underlying_dist == 'binomial':
+        if underlying_dist == 'bernoulli':
             RunningMean = RunningMeanThompsonBeta
         elif underlying_dist == 'gaussian':
             RunningMean = RunningMeanThompsonGaussian

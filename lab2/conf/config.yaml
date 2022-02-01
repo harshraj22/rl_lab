@@ -1,4 +1,10 @@
 seed: 5
 total_timesteps: 5000
+wandb_tracking: 'disabled'
+agent: 
+  type: 'eps_greedy'
+  reinforce:
+    baseline: True
 env:
-  num_arms: 3
+  num_arms: 5
+  reward_dist: 'bernoulli'

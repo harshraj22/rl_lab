@@ -29,7 +29,7 @@ class BanditArmRewardInitializer(ArmRewardInitilizer):
         Tuple[List[RewardDistribution], int]: A tuple of reward distributions and the
             index of the optimal arm.
         """
-        if self.initializer_type == "binomial":
+        if self.initializer_type == "bernoulli":
             reward_distribution = [BinomialRewardDistribution(1.0/(arm_index+2)) for arm_index in range(num_arms)]
             np.random.shuffle(reward_distribution)
             return reward_distribution, np.argmax([arm.p for arm in reward_distribution])
