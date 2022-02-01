@@ -146,9 +146,6 @@ class RunningMeanReinforce(RunningMean):
         selecting the arm."""
         return self._preference
 
-    def update_mean(self, reward: int, average_reward: float = 0.0) -> None:
-        self.running_mean_reward = (1-self.alpha) * average_reward + self.alpha * reward
-
     def update_preference(self, reward: int, average_reward: float = 0.0) -> None:
         self._preference = self._preference + self.beta * (reward - (average_reward if self.baseline else 0))
         self._preference = np.clip(self._preference, 0, 700)
