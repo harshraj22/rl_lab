@@ -23,7 +23,7 @@ logger.propagate = False
 @hydra.main(config_path="conf", config_name="config")
 def main(cfg):
     wandb_run = wandb.init(project="multi_arm_bandit", entity="harshraj22", mode=cfg.wandb_tracking)
-    # np.random.seed(cfg.seed)
+    np.random.seed(cfg.seed)
 
     env = MultiArmBanditEnvironment(
         arm_initializer=BanditArmRewardInitializer(cfg.env.reward_dist),
@@ -40,7 +40,7 @@ def main(cfg):
     elif cfg.agent.type == 'thompson_sampling':
         agent = ThompsonSamplingAgent(env.num_arms, underlying_dist=cfg.env.reward_dist)
     elif cfg.agent.type == 'reinforce':
-        agent = ReinforceAgent(env.num_arms, baseline=cfg.agent.reinforce.baseline)
+        agent = ReinforceAgent(env.num_arms, baseline=cfg.agent.reinforce.baseline, beta=0.2, alpha=0.9)
     else:
         raise ValueError(f'Unknown agent type: {cfg.agent.type}. Please choose from: eps_greedy, softmax, ucb, thompson_sampling, reinforce')
 
@@ -50,9 +50,10 @@ def main(cfg):
     for chance in tqdm(range(1, cfg.total_timesteps + 1)):
         action = agent(obs)
         obs, reward, done, info = env.step(action)
+        # logger.info(f'Env: {env.reward_distributions} | Action: {action} | Reward: {reward:.3f}')
         agent.update_mean(action, reward)
         wandb.log({
-            f"optimal_arm_percentage: {cfg.env.num_arms} arms": info['optimal_arm_hits'] / chance
+            f"optimal_arm_percentage: {cfg.env.num_arms} arms, {cfg.env.reward_dist} distribution": info['optimal_arm_hits'] / chance
         })
         # logger.info(f"obs: {obs}, reward: {reward}, done: {done}, info: {info}, agent: {agent.__class__.__name__}")
     logger.info(f"info: {info}")
