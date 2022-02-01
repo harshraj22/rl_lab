@@ -28,7 +28,6 @@ class ReinforceAgent(MultiArmBanditAgent):
 
     def update_mean(self, arm_index: int, reward: int) -> None:
         self.running_means[arm_index].update_preference(reward, self.average_reward)
-        self.running_means[arm_index].update_mean(reward, self.average_reward)
 
     def forward(self, state: int) -> int:
         """Choose the arm whose probability is maximum. The probability is calculated

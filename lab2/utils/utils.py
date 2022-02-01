@@ -138,16 +138,10 @@ class RunningMeanReinforce(RunningMean):
         """
         super(RunningMeanReinforce, self).__init__()
 
-        self.running_mean_reward = 0
         self.alpha = alpha
         self.beta = beta
         self._preference = 0.0
         self.baseline = baseline
-        self.times_selected = 1
-
-    @property
-    def mean(self) -> float:
-        return self.running_mean_reward / self.times_selected
 
     @property
     def preference(self) -> float:
@@ -157,15 +151,13 @@ class RunningMeanReinforce(RunningMean):
 
     def update_mean(self, reward: int, average_reward: float = 0.0) -> None:
         self.running_mean_reward = (1-self.alpha) * average_reward + self.alpha * reward
-        # self.running_mean_reward += reward
-        # self.times_selected += 1
 
     def update_preference(self, reward: int, average_reward: float = 0.0) -> None:
         self._preference = self._preference + self.beta * (reward - (average_reward if self.baseline else 0))
         self._preference = np.clip(self._preference, 0, 700)
 
     def __str__(self) -> str:
-        return f'Mean: {self.mean:.3f}, Preference: {self.preference:.3f}'
+        return f'Preference: {self.preference:.3f}'
 
     def __repr__(self) -> str:
         return self.__str__()
