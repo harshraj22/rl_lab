@@ -109,7 +109,7 @@ class RunningMeanThompsonGaussian(RunningMean):
         # Following point 2 from bayesNormal.pdf
         initial_mean, initial_std = 0, 1
         self.mu = np.mean(self.rewards)
-        self.sigma = np.std(self.rewards)
+        self.sigma = np.clip(np.std(self.rewards), 0.001, 10_000)
 
         std_sq = 1.0 / np.clip((1.0 / initial_std**2 + self.count / self.sigma**2), 0.001, 10_000)
         new_mean = std_sq * (initial_mean / initial_std**2 + self.mean*self.count / self.sigma**2)
