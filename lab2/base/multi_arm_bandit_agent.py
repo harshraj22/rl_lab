@@ -1,7 +1,12 @@
 from abc import ABC, abstractmethod
 
 
-class MultiArmBanditAgent:
+class MultiArmBanditAgent(ABC):
+
+    @abstractmethod
+    def update_mean(self, action: int, reward: int) -> None:
+        """Update the running mean of the selected action."""
+        pass
 
     @abstractmethod
     def forward(self, state: int) -> int:
@@ -15,15 +20,10 @@ class MultiArmBanditAgent:
         Returns
         -------
         int
+            The index of the arm selected.
         """
         pass
 
-    @abstractmethod
-    def update_mean(self, action: int, reward: int) -> None:
-        """Update the running mean of the selected action."""
-        pass
-
-    @abstractmethod
     def __call__(self, state: int) -> int:
         """Select an action.
 
@@ -37,4 +37,4 @@ class MultiArmBanditAgent:
         int
             The index of the arm selected.
         """
-        pass
+        return self.forward(state)
