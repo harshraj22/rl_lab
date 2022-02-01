@@ -28,3 +28,9 @@ class GaussianRewardDistribution(RewardDistribution):
     def sample(self) -> float:
         """Returns a sample from the Gaussian distribution."""
         return np.random.normal(self.mu, self.sigma)
+    
+    def __str__(self) -> str:
+        return f'Gaussian(mu={self.mu}, sigma={self.sigma})'
+
+    def __repr__(self) -> str:
+        return self.__str__()
