@@ -34,7 +34,7 @@ def main(cfg):
     if cfg.agent.type == 'eps_greedy':
         agent = EpsilonGreedyAgent(cfg.agent.eps_greedy.epsilon, env.num_arms, initial_temp=cfg.agent.eps_greedy.initial_temp, decay_factor=cfg.agent.eps_greedy.decay_factor)
     elif cfg.agent.type == 'softmax':
-        agent = SoftmaxAgent(env.num_arms)
+        agent = SoftmaxAgent(env.num_arms, initial_temp=cfg.agent.softmax.initial_temp, decay_factor=cfg.agent.softmax.decay_factor)
     elif cfg.agent.type == 'ucb':
         agent = UCBAgent(env.num_arms)
     elif cfg.agent.type == 'thompson_sampling':

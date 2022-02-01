@@ -1,8 +1,8 @@
 seed: 5
 total_timesteps: 5000
-wandb_tracking: 'disabled'
+wandb_tracking: 'disabled' # disabled, online
 agent: 
-  type: 'eps_greedy'
+  type: 'eps_greedy' # 'eps_greedy', 'softmax', 'thompson_sampling', 'ucb', 'reinforce'
   reinforce:
     baseline: True
     alpha: 0.9
@@ -11,6 +11,9 @@ agent:
     epsilon: 0.3
     initial_temp: 1.0
     decay_factor: 1.001
+  softmax:
+    initial_temp: 1000
+    decay_factor: 0.9
 env:
   num_arms: 5
-  reward_dist: 'bernoulli'
+  reward_dist: 'bernoulli' # 'bernoulli' or 'gaussian'
