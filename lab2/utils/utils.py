@@ -136,7 +136,6 @@ class RunningMeanReinforce(RunningMean):
         """
         super(RunningMeanReinforce, self).__init__()
 
-        self.alpha = alpha
         self.beta = beta
         self._preference = 0.0
         self.baseline = baseline
