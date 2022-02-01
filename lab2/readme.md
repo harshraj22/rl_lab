@@ -49,3 +49,52 @@ Directory Structure:
 └── utils                       <- Various utility functions and classes
     └── utils.py
 ```
+
+The api design has been created to make it easy to extend. In order to add a new agent, 
+```python
+# Create a new agent, it must inherit from MultiArmBanditAgent class
+
+from base.multi_arm_bandit_agent import MultiArmBanditAgent
+import numpy as np
+
+class NewAgent(MultiArmBanditAgent):
+# unlike PyTorch's models, you must define a few methods in the agent class, namely forward(), update_mean()
+    def __init__(self, num_arms: int):
+        super(NewAgent, self).__init__()
+        self.num_arms = num_arms
+
+    # forward() is the method that is called to make a prediction. It takes as input the state and returns the action
+    def forward(self, state):
+        # for now, let us select actions randomly
+        return np.random.randint(0, self.num_arms)
+
+    # update_mean() is the method that is called to update the underlying statistics of the reward distribution. It could be understood as the backward pass in case of a neural network which updates the underlying weights for better prediction
+    def update_mean(self):
+        pass
+
+```
+
+The environment and interactions with agent have also been designed in a way that is familiar to reinforcement learning practitioners.
+
+```python
+from data_loader.environments import MultiArmBanditEnvironment
+from data_loader.bandit_arm_reward_initializer import BanditArmRewardInitializer
+
+# create a Multi Arm Bandit environment, with underlying reward distribution of each arm following Bernoulli distribution
+env = MultiArmBanditEnvironment(
+    arm_initializer=BanditArmRewardInitializer('Bernoulli'),
+    num_arms=3,
+    total_timesteps=1000
+    )
+
+obs = env.reset()
+for _ in range(episode_length):
+    # agent selects an action
+    action = agent(obs)
+    # it interacts with the environment, and receives the reward
+    obs, reward, done, info = env.step(action)
+    
+    # agent updates its knowledge about the environment, in order to select better actions in the future
+    agent.update_mean(action, reward)
+
+```
