@@ -5,6 +5,12 @@ agent:
   type: 'eps_greedy'
   reinforce:
     baseline: True
+    alpha: 0.9
+    beta: 0.2
+  eps_greedy:
+    epsilon: 0.3
+    initial_temp: 1.0
+    decay_factor: 1.001
 env:
   num_arms: 5
   reward_dist: 'bernoulli'
