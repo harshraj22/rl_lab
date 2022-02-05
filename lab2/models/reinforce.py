@@ -35,9 +35,14 @@ class ReinforceAgent(MultiArmBanditAgent):
         super(ReinforceAgent, self).__init__()
         self.num_arms = num_arms
         self.baseline = baseline
-        self.running_means = [RunningMeanReinforce(baseline=baseline, beta=beta) for _ in range(num_arms)]
+        self.running_means = [RunningMeanReinforce(baseline=self.baseline, beta=self.beta) for _ in range(self.num_arms)]
         self._baseline_rewards_mean = 0.0
         self.alpha = alpha
+        self.beta = beta
+
+    def reset(self) -> None:
+        self.running_means = [RunningMeanReinforce(baseline=self.baseline, beta=self.beta) for _ in range(self.num_arms)]
+        self._baseline_rewards_mean = 0.0
 
     @property
     def average_reward(self):

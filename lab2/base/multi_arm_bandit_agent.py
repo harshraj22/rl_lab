@@ -8,6 +8,10 @@ class MultiArmBanditAgent(ABC):
         """Update the running mean of the selected action."""
         pass
 
+    def reset(self):
+        """Reset the agent initialization"""
+        pass
+
     @abstractmethod
     def forward(self, state: int) -> int:
         """Select an action.

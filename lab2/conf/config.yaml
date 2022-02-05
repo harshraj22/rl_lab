@@ -1,6 +1,7 @@
 seed: 5
 total_timesteps: 5000
 wandb_tracking: 'disabled' # disabled, online
+num_runs: 5
 agent: 
   type: 'eps_greedy' # 'eps_greedy', 'softmax', 'thompson_sampling', 'ucb', 'reinforce'
   reinforce:

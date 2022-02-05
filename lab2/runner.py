@@ -47,16 +47,20 @@ def main(cfg):
     wandb_run.name = str(agent)
 
     obs = env.reset()
-    for chance in tqdm(range(1, cfg.total_timesteps + 1)):
-        action = agent(obs)
-        obs, reward, done, info = env.step(action)
-        # logger.info(f'Env: {env.reward_distributions} | Action: {action} | Reward: {reward:.3f}')
-        agent.update_mean(action, reward)
-        wandb.log({
-            f"optimal_arm_percentage: {cfg.env.num_arms} arms, {cfg.env.reward_dist} distribution": info['optimal_arm_hits'] / chance
-        })
-        # logger.info(f"obs: {obs}, reward: {reward}, done: {done}, info: {info}, agent: {agent.__class__.__name__}")
-    logger.info(f"info: {info}")
+    rewards = np.zeros(cfg.num_runs, cfg.total_timesteps)
+
+    for run_index in tqdm(range(cfg.num_runs)):
+        for current_timestep in tqdm(range(1, cfg.total_timesteps + 1)):
+            action = agent(obs)
+            obs, reward, done, info = env.step(action)
+            rewards[run_index][current_timestep - 1] = reward
+            # logger.info(f'Env: {env.reward_distributions} | Action: {action} | Reward: {reward:.3f}')
+            agent.update_mean(action, reward)
+            # wandb.log({
+            #     f"optimal_arm_percentage: {cfg.env.num_arms} arms, {cfg.env.reward_dist} distribution": info['optimal_arm_hits'] / current_timestep
+            # })
+            # logger.info(f"obs: {obs}, reward: {reward}, done: {done}, info: {info}, agent: {agent.__class__.__name__}")
+        logger.info(f"info: {info}")
 
 if __name__ == '__main__':
     # pathlib.Path(f'{pathlib.Path.cwd()}/figs/').mkdir(parents=True, exist_ok=True)

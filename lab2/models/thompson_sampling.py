@@ -28,12 +28,16 @@ class ThompsonSamplingAgent(MultiArmBanditAgent):
         super(ThompsonSamplingAgent, self).__init__()
         self.num_arms = num_arms
         if underlying_dist == 'bernoulli':
-            RunningMean = RunningMeanThompsonBeta
+            self.RunningMean = RunningMeanThompsonBeta
         elif underlying_dist == 'gaussian':
-            RunningMean = RunningMeanThompsonGaussian
+            self.RunningMean = RunningMeanThompsonGaussian
         else:
             raise ValueError(f'Unknown underlying distribution {underlying_dist}')
-        self.running_means = [RunningMean() for _ in range(num_arms)]
+        self.running_means = [self.RunningMean() for _ in range(num_arms)]
+
+    def reset(self) -> None:
+        """Reset the agent."""
+        self.running_means = [self.RunningMean() for _ in range(self.num_arms)]
 
     def update_mean(self, arm_index: int, reward: int) -> None:
         self.running_means[arm_index].update_mean(reward)

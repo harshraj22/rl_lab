@@ -1,6 +1,8 @@
 import numpy as np
 import sys
 
+from torch import initial_seed
+
 sys.path.insert(0, '../')
 from utils.utils import RunningMean
 from base.multi_arm_bandit_agent import MultiArmBanditAgent
@@ -30,8 +32,14 @@ class EpsilonGreedyAgent(MultiArmBanditAgent):
         self.eps = eps
         self.num_arms = num_arms
         self.current_temp = initial_temp
+        self.initial_temp = initial_temp
         self.decay_factor = decay_factor
         self.running_means = [RunningMean() for _ in range(num_arms)]
+
+    def reset(self) -> None:
+        """Reset the agent."""
+        self.running_means = [RunningMean() for _ in range(self.num_arms)]
+        self.current_temp = self.initial_temp
 
     def update_mean(self, arm_index: int, reward: int) -> None:
         """Update the running mean of the selected arm_index."""

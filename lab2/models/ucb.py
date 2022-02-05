@@ -29,6 +29,10 @@ class UCBAgent(MultiArmBanditAgent):
         self.num_arms = num_arms
         self.running_means = [RunningMeanUCB() for _ in range(num_arms)]
 
+    def reset(self) -> None:
+        """Reset the agent."""
+        self.running_means = [RunningMeanUCB() for _ in range(self.num_arms)]
+
     def update_mean(self, arm_index: int, reward: int) -> None:
         self.running_means[arm_index].update_mean(reward)
 
