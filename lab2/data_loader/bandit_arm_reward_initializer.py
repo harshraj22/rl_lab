@@ -26,17 +26,17 @@ class BanditArmRewardInitializer(ArmRewardInitilizer):
 
         Returns
         -------
-        Tuple[List[RewardDistribution], int]: A tuple of reward distributions and the
-            index of the optimal arm.
+        Tuple[List[RewardDistribution], int, float]: A tuple of reward distributions and the
+            index of the optimal arm, optimal mean.
         """
         if self.initializer_type == "bernoulli":
             reward_distribution = [BinomialRewardDistribution(1.0/(arm_index+2)) for arm_index in range(num_arms)]
             np.random.shuffle(reward_distribution)
-            return reward_distribution, np.argmax([arm.p for arm in reward_distribution])
+            return reward_distribution, np.argmax([arm.p for arm in reward_distribution]), max([arm.p for arm in reward_distribution])
         elif self.initializer_type == "gaussian":
             reward_distribution = [GaussianRewardDistribution(10 * arm_index, arm_index * 2) for arm_index in range(1, num_arms+1)]
             np.random.shuffle(reward_distribution)
-            return reward_distribution, np.argmax([arm.mu for arm in reward_distribution])
+            return reward_distribution, np.argmax([arm.mu for arm in reward_distribution]), max([arm.mu for arm in reward_distribution])
         else:
             raise ValueError(f"Initializer not found.") 
 

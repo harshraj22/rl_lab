@@ -16,6 +16,12 @@ class BinomialRewardDistribution(RewardDistribution):
         """Returns reward of 1 with probability p and reward of 0 with probability 1-p."""
         return np.random.binomial(1, self.p)
 
+    def __str__(self) -> str:
+        return f'BinomalRewardDistribution(p={self.p:.3f})'
+
+    def __repr__(self) -> str:
+        return self.__str__()
+
 
 class GaussianRewardDistribution(RewardDistribution):
     """A Gaussian distribution with mean mu and standard deviation sigma."""

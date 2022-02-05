@@ -13,7 +13,7 @@ class MultiArmBanditEnvironment(gym.Env):
         super(MultiArmBanditEnvironment, self).__init__()
 
         self.num_arms = num_arms
-        self.reward_distributions, self.optimal_arm_index = arm_initializer(num_arms)
+        self.reward_distributions, self.optimal_arm_index, self._optimal_mean = arm_initializer(num_arms)
         self.total_timesteps = total_timesteps
         self.current_timestep = 0
         self.total_optimal_arms_hits = 0
@@ -21,7 +21,16 @@ class MultiArmBanditEnvironment(gym.Env):
         self.action_space = Discrete(num_arms)
         self.observation_space = Discrete(total_timesteps)
 
+    def __str__(self) -> str:
+        return f'Env: {self.reward_distributions}'
+
+    @property
+    def optimal_mean(self) -> float:
+        return self._optimal_mean
+
     def reset(self) -> int:
+        self.current_timestep = 0
+        self.total_optimal_arms_hits = 0
         return self.current_timestep
 
     def step(self, action: int) -> Tuple[int, float, bool, dict]:

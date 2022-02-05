@@ -1,13 +1,13 @@
 seed: 5
 total_timesteps: 5000
 wandb_tracking: 'disabled' # disabled, online
-num_runs: 5
+num_runs: 100
 agent: 
   type: 'eps_greedy' # 'eps_greedy', 'softmax', 'thompson_sampling', 'ucb', 'reinforce'
   reinforce:
     baseline: True
-    alpha: 0.9
-    beta: 0.2
+    alpha: 0.8
+    beta: 0.3
   eps_greedy:
     epsilon: 0.3
     initial_temp: 1.0
@@ -17,4 +17,4 @@ agent:
     decay_factor: 0.9
 env:
   num_arms: 5
-  reward_dist: 'bernoulli' # 'bernoulli' or 'gaussian'
+  reward_dist: 'gaussian' # 'bernoulli' or 'gaussian'

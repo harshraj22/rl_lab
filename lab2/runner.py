@@ -46,21 +46,39 @@ def main(cfg):
 
     wandb_run.name = str(agent)
 
-    obs = env.reset()
-    rewards = np.zeros(cfg.num_runs, cfg.total_timesteps)
+    rewards = np.zeros((cfg.num_runs, cfg.total_timesteps))
+    optimal_arm_hits = np.zeros((cfg.num_runs, cfg.total_timesteps))
+    mu_star = env.optimal_mean
 
     for run_index in tqdm(range(cfg.num_runs)):
+        agent.reset()
+        obs = env.reset()
+
         for current_timestep in tqdm(range(1, cfg.total_timesteps + 1)):
             action = agent(obs)
             obs, reward, done, info = env.step(action)
             rewards[run_index][current_timestep - 1] = reward
+            optimal_arm_hits[run_index][current_timestep - 1] = info['optimal_arm_hits'] / current_timestep
             # logger.info(f'Env: {env.reward_distributions} | Action: {action} | Reward: {reward:.3f}')
             agent.update_mean(action, reward)
-            # wandb.log({
-            #     f"optimal_arm_percentage: {cfg.env.num_arms} arms, {cfg.env.reward_dist} distribution": info['optimal_arm_hits'] / current_timestep
-            # })
-            # logger.info(f"obs: {obs}, reward: {reward}, done: {done}, info: {info}, agent: {agent.__class__.__name__}")
         logger.info(f"info: {info}")
+
+    mean_rewards = np.mean(rewards, axis=0)
+    mean_optimal_arm_hits = np.mean(optimal_arm_hits, axis=0)
+    cummulative_mean_reward = 0
+    for mean_reward, mean_optimal_arm_hit, current_timestep in zip(mean_rewards, mean_optimal_arm_hits, range(cfg.total_timesteps)):
+        cummulative_mean_reward += mean_reward
+        regret = mu_star * current_timestep - cummulative_mean_reward
+        wandb.log({
+            f"mean_reward: {cfg.env.num_arms} arms, {cfg.env.reward_dist} distribution": mean_reward,
+            f"optimal_arm_percentage: {cfg.env.num_arms} arms, {cfg.env.reward_dist} distribution": mean_optimal_arm_hit,
+            f"regret: {cfg.env.num_arms} arms, {cfg.env.reward_dist} distribution": regret
+        })
+
+    # logger.info(f'\nRewards: \n{rewards} \nMean: {mean_rewards}')
+    # logger.info(f'\nOptimal arm hits: \n{optimal_arm_hits} \nMean: {mean_optimal_arm_hits}')
+    # logger.info(f'Mean reward: {mean_rewards.shape}')
+    # logger.info(f'Env: {env}')
 
 if __name__ == '__main__':
     # pathlib.Path(f'{pathlib.Path.cwd()}/figs/').mkdir(parents=True, exist_ok=True)
