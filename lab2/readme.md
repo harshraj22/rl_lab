@@ -72,7 +72,7 @@ class NewAgent(MultiArmBanditAgent):
     # update_mean() is the method that is called to update the underlying statistics of the reward distribution. 
     # It could be understood as the backward pass in case of a neural network which updates the underlying 
     # weights for better prediction
-    def update_mean(self):
+    def update_mean(self, reward):
         pass
 
 ```
@@ -90,6 +90,7 @@ env = MultiArmBanditEnvironment(
     num_arms=3,
     total_timesteps=1000
     )
+agent = NewAgent()
 
 obs = env.reset()
 for _ in range(episode_length):
