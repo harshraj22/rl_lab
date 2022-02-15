@@ -74,6 +74,10 @@ class NewAgent(MultiArmBanditAgent):
     # weights for better prediction
     def update_mean(self, reward):
         pass
+        
+    # forget any info learnt about the environment
+    def reset(self):
+        pass
 
 ```
 
