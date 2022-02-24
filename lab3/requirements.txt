@@ -1,0 +1,5 @@
+numpy
+hydra-core
+gym
+tqdm
+wandb
