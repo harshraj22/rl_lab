@@ -6,7 +6,7 @@
 
 To run the code:         
 1. install the dependencies using `pip install -r requirements.txt`
-2. run the code using `python runner.py`
+2. run the code using `python3 runner.py`
 
 Note: The script uses [hydra](https://github.com/facebookresearch/hydra) for configuration management.
 To alter the configuration settings, either edit the `conf/config.yaml` file or use the command line as `python3 runner.py seed=5`. The visualization is done using [wandb](https://wandb.ai/harshraj22/multi_arm_bandit)
@@ -107,3 +107,20 @@ for _ in range(episode_length):
     agent.update_mean(action, reward)
 
 ```
+
+
+
+
+### Script to Reproduce Results:        
+1. Bernoulli Reward Distribution:
+    - softmax agent: `python3 runner.py env.reward_dist=bernoulli agent.type=softmax`
+    - eps_greedy agent: `python3 runner.py env.reward_dist=bernoulli agent.type=eps_greedy`
+    - thompson_sampling agent: `python3 runner.py env.reward_dist=bernoulli agent.type=thompson_sampling`
+    - ucb agent: `python3 runner.py env.reward_dist=bernoulli agent.type=ucb`
+    - reinforce agent: `python3 runner.py env.reward_dist=bernoulli agent.type=reinforce agent.reinforce.baseline=True`
+2. Gaussian Reward Distribution:
+    - softmax agent: `python3 runner.py env.reward_dist=gaussian agent.type=softmax`
+    - eps_greedy agent: `python3 runner.py env.reward_dist=gaussian agent.type=eps_greedy`
+    - thompson_sampling agent: `python3 runner.py env.reward_dist=gaussian agent.type=thompson_sampling`
+    - ucb agent: `python3 runner.py env.reward_dist=gaussian agent.type=ucb`
+    - reinforce agent: `python3 runner.py env.reward_dist=gaussian agent.type=reinforce agent.reinforce.baseline=True`
