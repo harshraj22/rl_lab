@@ -4,6 +4,9 @@ from abc import ABC, abstractmethod
 
 class IterationEnv(ABC, gym.Env):
     """Abstract class for an iteration environment."""
+    def __init__(self, gamma: float) -> None:
+        super(IterationEnv, self).__init__()
+        self.gamma = gamma
 
     @property
     @abstractmethod
