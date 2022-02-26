@@ -39,8 +39,8 @@ class GridWorldEnvironment(IterationEnv):
     state in East direction and 10% chance of moving to the state in West direction.
     """
 
-    def __init__(self, start_state: int = 0) -> None:
-        super(GridWorldEnvironment, self).__init__()
+    def __init__(self, start_state: int = 0, gamma: float = 0.9) -> None:
+        super(GridWorldEnvironment, self).__init__(gamma)
         self.action_space = Discrete(4)
         self.observation_space = Discrete(15)
         self._state = start_state
@@ -97,13 +97,11 @@ class GridWorldEnvironment(IterationEnv):
         if self.is_valid_coordinate(x, y):
             self._state = self.coordinates_to_integer_state(x, y)
 
-        reward, done = 0, 0
+        reward, done = 0, False
         if self._state == self._goal_state:
-            reward = self._goal_state_reward
-            done = 1
+            reward, done = self._goal_state_reward, True
         elif self._state == self._terminal_state:
-            reward = self._terminal_state_reward
-            done = 1
+            reward, done = self._terminal_state_reward, True
         
         return self._state, reward, done, {}        
 
@@ -119,10 +117,10 @@ class GridWorldEnvironment(IterationEnv):
 
 
 if __name__ == '__main__':
-    env = GridWorldEnvironment()
-    done = False
-    while not done:
-        action = env.action_space.sample()
-        print(action)
-        obs, reward, done, _ = env.step(action)
-        print(obs, reward, done)
+    # env = GridWorldEnvironment()
+    # done = False
+    # while not done:
+    #     action = env.action_space.sample()
+    #     print(action)
+    #     obs, reward, done, _ = env.step(action)
+    #     print(obs, reward, done)
