@@ -55,6 +55,57 @@ class GridWorldEnvironment(IterationEnv):
     def render(self) -> None:
         pass
 
+    def transition_probability(self, action: int, initial_state: int, final_state: int) -> float:
+        """Return the transition probability of ending at final_state if taken
+        action in initial_state."""
+        if initial_state == self._terminal_state or initial_state == self._goal_state:
+            return initial_state == final_state
+
+        x_i, y_i = self.integer_state_to_coordinates(initial_state)
+        x_f, y_f = self.integer_state_to_coordinates(final_state)
+
+        required_probability = 0.0
+        action_dict = {
+            Directions.UP: (-1, 0),
+            Directions.DOWN: (1, 0),
+            Directions.RIGHT: (0, 1),
+            Directions.LEFT: (0, -1)
+        }
+        # update (x_i, y_i) corresponding to the action with taking the boundary
+        # of grid into account
+        x_i_final, y_i_final = x_i, y_i
+        if self.is_valid_coordinate(x_i + action_dict[action][0], y_i + action_dict[action][1]):
+            x_i_final, y_i_final = x_i + action_dict[action][0], y_i + action_dict[action][1]
+
+        # if (x_i_final, y_i_final) == (x_f, y_f): add 0.8 to the probability
+        if (x_i_final, y_i_final) == (x_f, y_f):
+            required_probability = 0.8
+
+        # do the same with perpendicular action, adding 0.1 to the probability
+        # on success
+        perpendicular_action = (action + 1) % Directions.TOTAL_DIRECTIONS
+        x_i_final, y_i_final = x_i, y_i
+        if self.is_valid_coordinate(x_i + action_dict[perpendicular_action][0], y_i + action_dict[perpendicular_action][1]):
+            x_i_final, y_i_final = x_i + action_dict[perpendicular_action][0], y_i + action_dict[perpendicular_action][1]
+
+        # if (x_i_final, y_i_final) == (x_f, y_f): add 0.8 to the probability
+        if (x_i_final, y_i_final) == (x_f, y_f):
+            required_probability += 0.1
+
+        perpendicular_action = (action - 1 + Directions.TOTAL_DIRECTIONS) % Directions.TOTAL_DIRECTIONS
+        x_i_final, y_i_final = x_i, y_i
+        if self.is_valid_coordinate(x_i + action_dict[perpendicular_action][0], y_i + action_dict[perpendicular_action][1]):
+            x_i_final, y_i_final = x_i + action_dict[perpendicular_action][0], y_i + action_dict[perpendicular_action][1]
+
+        # if (x_i_final, y_i_final) == (x_f, y_f): add 0.8 to the probability
+        if (x_i_final, y_i_final) == (x_f, y_f):
+            required_probability += 0.1
+
+
+        # return the probability
+        return required_probability
+
+
     def integer_state_to_coordinates(self, cur_state: int) -> Tuple[int, int]:
         """Convert the integer state to coordinates."""
         if cur_state >= 9:
@@ -75,6 +126,9 @@ class GridWorldEnvironment(IterationEnv):
 
     def step(self, action: int) -> Tuple[int, float, bool, dict]:
         """Return observation, reward, done, and info."""
+        if self._state == self._terminal_state or self._state == self._goal_state:
+            return self._state, 0, True, {}
+
         x, y = self.integer_state_to_coordinates(self._state)
 
         transition_probability = np.random.uniform(0, 1)
@@ -117,6 +171,7 @@ class GridWorldEnvironment(IterationEnv):
 
 
 if __name__ == '__main__':
+    pass
     # env = GridWorldEnvironment()
     # done = False
     # while not done:
