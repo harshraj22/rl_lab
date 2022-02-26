@@ -13,20 +13,19 @@ class ValueIterationAgent(IterationAgent):
         super(ValueIterationAgent, self).__init__()
         self.num_states = num_states
         self.num_actions = num_actions
-        self.values = np.zeros(self.num_states)
+        self.value_functions = np.zeros(self.num_states)
 
     def learn(self, env: gym.Env, num_timesteps: int = 1000) -> None:
         """Learn from the environment."""
         for current_timestep in range(num_timesteps):
-            new_values = np.zeros_like(self.values)
+            new_values = np.zeros_like(self.value_functions)
             for state in range(self.num_states):
                 for action in range(self.num_actions):
                     with PreserveEnvStateManager(env) as cur_env:
                         _, reward, _, _ = cur_env.step(action)
-                        # TODO: Add/think about the discounting factor
-                        new_values[state] = max(new_values[state], reward + self.values[state])
+                        new_values[state] = max(new_values[state], reward + cur_env.gamma * self.value_functions[state])
 
-            self.values = new_values
+            self.value_functions = new_values
 
 
     def action(self, state: int) -> int:
