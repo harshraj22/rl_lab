@@ -1,8 +1,11 @@
 import sys
+from typing import Callable
 import numpy as np
 import gym
 import logging
+from tqdm import tqdm
 
+from lab3.base.iteration_env import IterationEnv
 
 sys.path.insert(0, '../')
 from base.iteration_agent import IterationAgent
@@ -30,20 +33,22 @@ class ValueIterationAgent(IterationAgent):
 
     def learn(self, env: GridWorldEnvironment, num_timesteps: int = 1000) -> None:
         """Learn from the environment."""
-        for current_timestep in range(num_timesteps):
+        for current_timestep in tqdm(range(num_timesteps), f'Learning for {num_timesteps}', total=num_timesteps):
             new_values = np.full(self.value_functions.shape, -np.inf)
             for state in range(self.num_states):
                 env.state = state
                 for action in range(self.num_actions):
-                    with PreserveEnvStateManager(env) as cur_env:
-                        # logger.info(f'State: {cur_env.state}, Action: {action}')
-                        _, reward, _, _ = cur_env.step(action)
-                        # logger.info(f'New state: {cur_env.state}, Reward: {reward}')
-                        new_values[state] = max(new_values[state], reward + cur_env.gamma * self.value_functions[cur_env.state])
-                # logger.info(f'State: {state}, Reward: {reward}')
-
+                    # Taking the action 'num_stpes' times, to procure the estimated
+                    # value of R(i, a, j) + gamma * V(j).
+                    _current_sum, num_steps = 0, 100
+                    for _ in range(num_steps):
+                        with PreserveEnvStateManager(env) as cur_env:
+                            _, reward, _, _ = cur_env.step(action)
+                            _current_sum += reward + cur_env.gamma * self.value_functions[cur_env.state]
+                    new_values[state] = max(new_values[state], _current_sum / num_steps)
+            
             self.value_functions = new_values
-
+            # print the value function
 
     def action(self, state: int) -> int:
         """Select an action."""
