@@ -9,6 +9,17 @@ sys.path.insert(0, '../')
 from base.iteration_env import IterationEnv
 
 from enum import IntEnum
+import logging
+
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+handler = logging.StreamHandler(sys.stdout)
+handler.setLevel(logging.INFO)
+formatter = logging.Formatter("[%(name)s] [%(levelname)s] %(message)s")
+handler.setFormatter(formatter)
+logger.addHandler(handler)
+logger.propagate = False
 
 
 class Directions(IntEnum):
@@ -136,17 +147,19 @@ class GridWorldEnvironment(IterationEnv):
             action = (action - 1 + Directions.TOTAL_DIRECTIONS) % Directions.TOTAL_DIRECTIONS
         elif transition_probability >= 0.9:
             action = (action + 1 + Directions.TOTAL_DIRECTIONS) % Directions.TOTAL_DIRECTIONS
+        # logger.info(f'x: {x}, y: {y}, action: {action}, state: {self._state}')
 
         if action == Directions.UP:
-            y = y - 1
-        elif action == Directions.DOWN:
-            y = y + 1
-        elif action == Directions.RIGHT:
-            x = x + 1
-        elif action == Directions.LEFT:
             x = x - 1
+        elif action == Directions.DOWN:
+            x = x + 1
+        elif action == Directions.RIGHT:
+            y = y + 1
+        elif action == Directions.LEFT:
+            y = y - 1
         else:
             raise ValueError("Illegal action")
+
 
         if self.is_valid_coordinate(x, y):
             self._state = self.coordinates_to_integer_state(x, y)

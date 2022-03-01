@@ -91,9 +91,9 @@ class PolicyIterationAgent(IterationAgent):
             
             self.value_functions = new_values
         
-        new_values = list(new_values)
-        new_values.insert(9, 0)
-        tqdm.write(f'Value functions: \n{np.array(new_values).reshape((4, 4))}')
+        # new_values = list(new_values)
+        # new_values.insert(9, 0)
+        # tqdm.write(f'Value functions: \n{np.array(new_values).reshape((4, 4))}')
 
     def action(self, state: int) -> int:
         """Select an action."""
