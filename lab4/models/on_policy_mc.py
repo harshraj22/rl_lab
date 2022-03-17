@@ -9,7 +9,16 @@ from base.baseagent import BaseAgent
 
 
 class FirstVisitMonteCarlo(BaseAgent):
-    """Agent that uses first-visit Monte Carlo (on-policy MC)
+    """Agent that uses first-visit Monte Carlo (on-policy MC).
+
+    Properties:
+    ----------------
+    First Visit: Use rewards from the first time the state-action pair is visited in
+        a trajectory.
+    On Policy: The policy is improved using samples generated from the current
+        policy.
+    Offline: The agent has to wait till the end of the trajectory to update the
+        policy.
     https://i.stack.imgur.com/033M8.png
     """
     def __init__(self, num_states: int, num_actions: int, eps: float = 0.2) -> None:
