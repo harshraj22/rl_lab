@@ -25,7 +25,7 @@ class BaseAgent(ABC):
         return self.forward(state)
 
     @abstractmethod
-    def learn(self, reward: Union[int, List[int]]) -> None:
+    def step(self, reward: Union[int, List[int]]) -> None:
         # ToDo: update the type of reward. It should also have info about states
         """Update the agent's knowledge.
 
@@ -36,4 +36,9 @@ class BaseAgent(ABC):
             agents, a reward is a single value. In case of offline learning agents,
             a reward is a list of rewards over the whole trajectory.
         """
+        pass
+
+    @abstractmethod
+    def learn(self) -> None:
+        """Update the agent's policy."""
         pass
