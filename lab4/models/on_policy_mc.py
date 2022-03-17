@@ -22,6 +22,16 @@ class FirstVisitMonteCarlo(BaseAgent):
     https://i.stack.imgur.com/033M8.png
     """
     def __init__(self, num_states: int, num_actions: int, eps: float = 0.2) -> None:
+        """
+        Parameters:
+        ----------
+        num_states : int
+            Number of states in the environment.
+        num_actions : int
+            Number of actions in the environment.
+        eps : float
+            Probability of selecting a random action.
+        """
         super(FirstVisitMonteCarlo, self).__init__()
         self.num_states = num_states
         self.num_actions = num_actions
@@ -38,6 +48,8 @@ class FirstVisitMonteCarlo(BaseAgent):
 
     def forward(self, state: int) -> int:
         """Select an action."""
+        if np.random.rand() < self.eps:
+            return np.random.randint(0, self.num_actions)
         return self.policy[state]
 
     def learn(self) -> None:
