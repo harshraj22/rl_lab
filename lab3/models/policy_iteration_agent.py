@@ -1,9 +1,11 @@
 import sys
-from typing import Callable
+from typing import Callable, Dict, List
 import numpy as np
 import gym
 import logging
 from tqdm import tqdm
+import wandb
+from copy import deepcopy
 
 sys.path.insert(0, '../')
 from base.iteration_agent import IterationAgent
@@ -24,6 +26,7 @@ logger.propagate = False
 class PolicyIterationAgent(IterationAgent):
     """A generic class for a value iteration agent."""
     def __init__(self, num_states: int, num_actions: int = 4) -> None:
+        wandb_run = wandb.init(project="value-policy-iteration", entity="harshraj22", mode='disabled')
         super(PolicyIterationAgent, self).__init__()
         self.num_states = num_states
         self.num_actions = num_actions
@@ -47,8 +50,9 @@ class PolicyIterationAgent(IterationAgent):
         #     14: Directions.LEFT
         # }
 
-    def learn(self, env: GridWorldEnvironment, num_timesteps: int = 10, num_episode: int = 100) -> None:
+    def learn(self, env: GridWorldEnvironment, num_timesteps: int = 10, num_episode: int = 100) -> List[Dict]:
         """Learn from the environment."""
+        policies = []
         for _ in tqdm(range(num_episode), f'Learning for {num_episode}', total=num_episode):
             # 1. policy evaluation
             self.policy_evaluation(env, num_timesteps)
@@ -71,9 +75,13 @@ class PolicyIterationAgent(IterationAgent):
                 # logger.info(f'state: {state}, Best action: {_best_action}')
                     # self.policy[state] = np.argmax([self.value_functions[cur_env.step(action)[0]] for action in range(self.num_actions)])
 
+            policies.append(deepcopy(self.policy))
+        return policies
 
     def policy_evaluation(self, env: GridWorldEnvironment, num_timesteps: int = 1000) -> None:
         """Evaluate the policy"""
+        value_functions_array, value_func_diff_array = [np.zeros_like(self.value_functions)], [np.zeros_like(self.value_functions)]
+
         for current_timestep in tqdm(range(num_timesteps), f'Learning value fun for {num_timesteps}', total=num_timesteps):
             new_values = np.full(self.value_functions.shape, -np.inf)
             for state in range(self.num_states):
@@ -88,8 +96,17 @@ class PolicyIterationAgent(IterationAgent):
                         # assert reward >= 0, f'Current state: {state}, action: {action}, reward: {reward}'
                         _current_sum += reward + cur_env.gamma * self.value_functions[cur_env.state]
                 new_values[state] = _current_sum / num_steps
+
+            value_func_diff = np.abs(self.value_functions - new_values)
+            wandb.log({
+                'avg_value_func_diff_Policy_iter': np.mean(value_func_diff),
+                'max_value_func_diff_Policy_iter': np.max(value_func_diff),
+            })
             
             self.value_functions = new_values
+
+            value_functions_array.append(self.value_functions)
+            value_func_diff_array.append(value_func_diff)
         
         # new_values = list(new_values)
         # new_values.insert(9, 0)

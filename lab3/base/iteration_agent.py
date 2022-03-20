@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from typing import Any
 import gym
 
 
@@ -6,7 +7,7 @@ class IterationAgent(ABC):
     """Abstract class for an iteration agent."""
 
     @abstractmethod
-    def learn(self, env: gym.Env) -> None:
+    def learn(self, env: gym.Env) -> Any:
         """Learn from the environment."""
         pass
 
