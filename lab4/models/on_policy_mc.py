@@ -21,7 +21,7 @@ class FirstVisitMonteCarlo(BaseAgent):
         policy.
     https://i.stack.imgur.com/033M8.png
     """
-    def __init__(self, num_states: int, num_actions: int, eps: float = 0.2) -> None:
+    def __init__(self, num_states: int, num_actions: int, eps: float = 0.2, decay_factor: float = 0.9) -> None:
         """
         Parameters:
         ----------
@@ -31,11 +31,14 @@ class FirstVisitMonteCarlo(BaseAgent):
             Number of actions in the environment.
         eps : float
             Probability of selecting a random action.
+        decay_factor : float
+            The rate at which epsilon decays.
         """
         super(FirstVisitMonteCarlo, self).__init__()
         self.num_states = num_states
         self.num_actions = num_actions
         self.eps = eps
+        self.decay_factor = decay_factor
 
         # initialize the policy
         self.policy = np.random.randint(0, self.num_actions, size=self.num_states)
@@ -61,6 +64,8 @@ class FirstVisitMonteCarlo(BaseAgent):
         # update the policy
         for state in range(self.num_states):
             self.policy[state] = np.argmax(self.Q[state])
+
+        self.eps = np.clip(self.eps * self.decay_factor, 0.01, 1)
 
     def step(self, state: int, action: int, reward: int) -> None:
         """Update the agent's knowledge.
