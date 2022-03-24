@@ -1,4 +1,4 @@
-num_episodes: 10000
+num_episodes: 5000
 env: Taxi-v3
 seed: 5
 agent:

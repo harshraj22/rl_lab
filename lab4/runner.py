@@ -1,15 +1,15 @@
+import sys
+import random
+import logging
+from tqdm import tqdm
+
 import gym
 
 from data_loader.environments import LinearEnv
 from models.on_policy_mc import FirstVisitMonteCarlo
 from utils.utils import Sample
-from utils.wrappers import FrozenLakeWrapper
+from base.baseagent import BaseAgent
 from omegaconf import OmegaConf
-
-import logging
-import sys
-from tqdm import tqdm
-import random
 
 
 logger = logging.getLogger(__name__)
@@ -31,24 +31,23 @@ logger.propagate = False
 """
 
 
-if __name__ == '__main__':
-    config = OmegaConf.load('conf/config.yaml')
-    random.seed(config.seed)
-
-    # ToDo: Create agent, environment depending on config
-    env = gym.make('FrozenLake-v1') # A discrete Action Space environment
-    # env = LinearEnv(max_time=8)
-    env.seed(config.seed)
-    agent = FirstVisitMonteCarlo(
-        env.observation_space.n,
-        env.action_space.n,
-        decay_factor=config.agent.montecarlo.decay_factor,
-        eps=config.agent.montecarlo.eps
-        )
-
-    recieved_perfect = False
-    print(f'Details about env: Actions: {env.action_space.n} | States: {env.observation_space.n}')
-
+def learn_offline(agent: BaseAgent, env: gym.Env, config) -> BaseAgent:
+    """Function to train the agents that learn offline.
+    Parameters:
+    ----------
+    agent : BaseAgent
+        The agent to train.
+    env : gym.Env
+        The environment to train the agent on.
+    config : dict
+        The configuration for the agent and environment and experiemnt.
+    
+    Returns:
+    -------
+    agent : BaseAgent
+        The trained agent.
+    """
+    recieved_perfect = 0
     for episode in tqdm(range(config.num_episodes)):
         state = env.reset()
         done = False
@@ -75,8 +74,38 @@ if __name__ == '__main__':
             visited.add((sample.state, sample.action))
         
         agent.learn()
-        recieved_perfect += bool(returns[0])
+        recieved_perfect += int(returns[0])
         logger.info(f'Episode {episode}/{config.num_episodes}, Reward: {returns[0]:.3f}, Epsilon: {agent.eps:.3f}, time: {len(trajectory)} | recieved perfect: {recieved_perfect}')
         # logger.info(f'Q: {agent.Q}')
         # logger.info(f'Returns: {returns}\n Trajectory: {trajectory}')
+    return agent
+
+
+if __name__ == '__main__':
+    config = OmegaConf.load('conf/config.yaml')
+    random.seed(config.seed)
+
+    # ToDo: Create agent, environment depending on config
+    env = gym.make('FrozenLake-v1') # A discrete Action Space environment
+    # env = LinearEnv(max_time=8)
+    env.seed(config.seed)
+    agent = FirstVisitMonteCarlo(
+        env.observation_space.n,
+        env.action_space.n,
+        decay_factor=config.agent.montecarlo.decay_factor,
+        eps=config.agent.montecarlo.eps
+        )
+
+    print(f'Details about env: Actions: {env.action_space.n} | States: {env.observation_space.n}')
+    trained_agent = learn_offline(agent, env, config)
+
+    # Test the agent
+    done, state, reward = False, env.reset(), 0
+    while not done:
+        action = trained_agent.forward(state)
+        state, reward, done, _ = env.step(action)
+        env.render()
+    print(f'Reward: {reward}')
+
+    
         
