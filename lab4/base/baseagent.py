@@ -1,6 +1,10 @@
 from abc import ABC, abstractmethod
 from typing import Union, List
 
+import sys
+sys.path.append('..')
+from utils.utils import Sample
+
 
 class BaseAgent(ABC):
     """Abstract class for agents"""
@@ -25,16 +29,12 @@ class BaseAgent(ABC):
         return self.forward(state)
 
     @abstractmethod
-    def step(self, reward: Union[int, List[int]]) -> None:
-        # ToDo: update the type of reward. It should also have info about states
+    def step(self, sample: Sample) -> None:
         """Update the agent's knowledge.
 
         Parameters
         ----------
-        reward : Union[int, List[int]]
-            The reward received from the environment. In case of online learning
-            agents, a reward is a single value. In case of offline learning agents,
-            a reward is a list of rewards over the whole trajectory.
+        sample: info about a timestep of the trajectory
         """
         pass
 

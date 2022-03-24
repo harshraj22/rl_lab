@@ -6,6 +6,7 @@ import sys
 sys.path.append('..')
 
 from base.baseagent import BaseAgent
+from utils.utils import Sample
 
 
 class FirstVisitMonteCarlo(BaseAgent):
@@ -67,18 +68,14 @@ class FirstVisitMonteCarlo(BaseAgent):
 
         self.eps = np.clip(self.eps * self.decay_factor, 0.01, 1)
 
-    def step(self, state: int, action: int, reward: int) -> None:
+    def step(self, sample: Sample) -> None:
         """Update the agent's knowledge.
 
         Parameters
         ----------
-        state : int
-            The current state of the environment.
-        action : int
-            The action selected by the agent.
-        reward : int
-            The reward received from the environment.
+        sample: info about a timestep of the trajectory
         """
+        state, action, reward, next_state = sample
         # update the returns
         if (state, action) in self.returns.keys():
             pass # skip if the state-action pair has been visited before

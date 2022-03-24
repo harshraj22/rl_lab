@@ -36,7 +36,7 @@ if __name__ == '__main__':
 
         returns = returns[:0:-1]
         for sample, return_ in zip(trajectory, returns):
-            agent.step(sample.state, sample.action, return_)
+            agent.step(Sample(sample.state, sample.action, return_, sample.next_state))
         
         agent.learn()
         print(f'Episode {episode}/{num_episodes}, Reward: {returns[0]}, Epsilon: {agent.eps:.3f}')
