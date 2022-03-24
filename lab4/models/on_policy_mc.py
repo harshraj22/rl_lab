@@ -1,6 +1,7 @@
 from collections import defaultdict
-from typing import DefaultDict, List, Tuple
+from typing import DefaultDict, List, Tuple, Deque
 import numpy as np
+from collections import deque
 
 import sys
 sys.path.append('..')
@@ -48,7 +49,7 @@ class FirstVisitMonteCarlo(BaseAgent):
         self.Q = np.random.randn(self.num_states, self.num_actions)
 
         # Returns
-        self.returns: DefaultDict[Tuple[int, int], List[int]] = defaultdict(list)
+        self.returns: DefaultDict[Tuple[int, int], Deque[int]] = defaultdict(lambda: deque(maxlen=77))
 
     def forward(self, state: int) -> int:
         """Select an action."""
@@ -75,8 +76,8 @@ class FirstVisitMonteCarlo(BaseAgent):
         ----------
         sample: info about a timestep of the trajectory
         """
-        state, action, reward, next_state = sample
+        state, action, return_, next_state = sample
         # update the returns
-        if (state, action) in self.returns.keys():
-            pass # skip if the state-action pair has been visited before
-        self.returns[(state, action)].append(reward)
+        # if (state, action) in self.returns.keys():
+        #     pass # skip if the state-action pair has been visited before
+        self.returns[(state, action)].append(return_)
