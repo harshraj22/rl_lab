@@ -1,0 +1,13 @@
+num_episodes: 100
+env: Taxi-v3
+agent:
+  type: montecarlo
+  montecarlo:
+    eps: 0.3
+    decay_factor: 0.99
+  sarsa:
+    eps: 0.3
+    decay_factor: 0.99
+  qlearning:
+    eps: 0.3
+    decay_factor: 0.99

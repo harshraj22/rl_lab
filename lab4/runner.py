@@ -2,6 +2,7 @@ import gym
 
 from models.on_policy_mc import FirstVisitMonteCarlo
 from utils.utils import Sample
+from omegaconf import OmegaConf
 
 """ General way for offline agents:
 
@@ -11,14 +12,22 @@ from utils.utils import Sample
     4. Call `agent.learn()` at the end of the episode
 """
 
-env = gym.make('Taxi-v3') # A discrete Action Space environment
 
 if __name__ == '__main__':
-    print(f'Details about env: Actions: {env.action_space.n} | States: {env.observation_space.n}')
-    num_episodes = 1000
-    agent = FirstVisitMonteCarlo(env.observation_space.n, env.action_space.n, decay_factor=0.99, eps=0.33)
+    config = OmegaConf.load('conf/config.yaml')
 
-    for episode in range(num_episodes): 
+    # ToDo: Create agent, environment depending on config
+    env = gym.make('Taxi-v3') # A discrete Action Space environment
+    agent = FirstVisitMonteCarlo(
+        env.observation_space.n,
+        env.action_space.n,
+        decay_factor=config.agent.montecarlo.decay_factor,
+        eps=config.agent.montecarlo.eps
+        )
+
+    print(f'Details about env: Actions: {env.action_space.n} | States: {env.observation_space.n}')
+
+    for episode in range(config.num_episodes): 
         state = env.reset()
         done = False
         trajectory = []
@@ -39,5 +48,5 @@ if __name__ == '__main__':
             agent.step(Sample(sample.state, sample.action, return_, sample.next_state))
         
         agent.learn()
-        print(f'Episode {episode}/{num_episodes}, Reward: {returns[0]}, Epsilon: {agent.eps:.3f}')
+        print(f'Episode {episode}/{config.num_episodes}, Reward: {returns[0]}, Epsilon: {agent.eps:.3f}')
         
