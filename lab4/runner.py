@@ -3,10 +3,13 @@ import gym
 from data_loader.environments import LinearEnv
 from models.on_policy_mc import FirstVisitMonteCarlo
 from utils.utils import Sample
+from utils.wrappers import FrozenLakeWrapper
 from omegaconf import OmegaConf
 
 import logging
 import sys
+from tqdm import tqdm
+import random
 
 
 logger = logging.getLogger(__name__)
@@ -30,10 +33,12 @@ logger.propagate = False
 
 if __name__ == '__main__':
     config = OmegaConf.load('conf/config.yaml')
+    random.seed(config.seed)
 
     # ToDo: Create agent, environment depending on config
     env = gym.make('FrozenLake-v1') # A discrete Action Space environment
-    env = LinearEnv()
+    # env = LinearEnv(max_time=8)
+    env.seed(config.seed)
     agent = FirstVisitMonteCarlo(
         env.observation_space.n,
         env.action_space.n,
@@ -41,9 +46,10 @@ if __name__ == '__main__':
         eps=config.agent.montecarlo.eps
         )
 
+    recieved_perfect = False
     print(f'Details about env: Actions: {env.action_space.n} | States: {env.observation_space.n}')
 
-    for episode in range(config.num_episodes):
+    for episode in tqdm(range(config.num_episodes)):
         state = env.reset()
         done = False
         trajectory = []
@@ -54,7 +60,7 @@ if __name__ == '__main__':
             next_state, reward, done, _ = env.step(action)
             trajectory.append(Sample(state, action, reward, next_state))
             state = next_state
-            env.render()
+            # env.render()
         
         # calculate the discounted sum of returns
         inverted_returns = [0]
@@ -69,6 +75,8 @@ if __name__ == '__main__':
             visited.add((sample.state, sample.action))
         
         agent.learn()
-        print(f'Episode {episode}/{config.num_episodes}, Reward: {returns[0]}, Epsilon: {agent.eps:.3f}, time: {len(trajectory)}')
+        recieved_perfect += bool(returns[0])
+        logger.info(f'Episode {episode}/{config.num_episodes}, Reward: {returns[0]:.3f}, Epsilon: {agent.eps:.3f}, time: {len(trajectory)} | recieved perfect: {recieved_perfect}')
+        # logger.info(f'Q: {agent.Q}')
         # logger.info(f'Returns: {returns}\n Trajectory: {trajectory}')
         

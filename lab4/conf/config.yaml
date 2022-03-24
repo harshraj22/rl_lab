@@ -1,10 +1,11 @@
-num_episodes: 500
+num_episodes: 10000
 env: Taxi-v3
+seed: 5
 agent:
   type: montecarlo
   montecarlo:
-    eps: 0.5
-    decay_factor: 0.99
+    eps: 0.8
+    decay_factor: 0.995
   sarsa:
     eps: 0.3
     decay_factor: 0.99

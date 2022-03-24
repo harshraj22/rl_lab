@@ -49,7 +49,7 @@ class FirstVisitMonteCarlo(BaseAgent):
         self.Q = np.random.randn(self.num_states, self.num_actions)
 
         # Returns
-        self.returns: DefaultDict[Tuple[int, int], Deque[int]] = defaultdict(lambda: deque(maxlen=77))
+        self.returns: DefaultDict[Tuple[int, int], Deque[int]] = defaultdict(lambda: deque())
 
     def forward(self, state: int) -> int:
         """Select an action."""
@@ -61,7 +61,7 @@ class FirstVisitMonteCarlo(BaseAgent):
         """Update the policy"""
         for state in range(self.num_states):
             for action in range(self.num_actions):
-                self.Q[state][action] = np.mean(self.returns[(state, action)])
+                self.Q[state][action] = np.mean(self.returns[(state, action)]) if self.returns[(state, action)] else 0
 
         # update the policy
         for state in range(self.num_states):

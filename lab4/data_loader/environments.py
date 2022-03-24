@@ -12,13 +12,13 @@ class LinearEnv(gym.Env):
     State 5 is the terminal state and agent recieves a reward of 1 on reaching
     that state. An episode can be played for a maximum of _max_time steps.
     """
-    def __init__(self):
+    def __init__(self, max_time: int = 10):
         super(LinearEnv, self).__init__()
         self.action_space = Discrete(2)
         self.observation_space = Discrete(6)
         self._state = 0
         self._time = 0
-        self._max_time = 10
+        self._max_time = max_time
 
     def reset(self):
         self._time = 1
