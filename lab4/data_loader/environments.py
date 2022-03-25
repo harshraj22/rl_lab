@@ -38,7 +38,7 @@ class LinearEnv(gym.Env):
         self._state = new_state
         return new_state, reward, done, {}
 
-    def render(self):
+    def render(self, mode: str = 'human'):
         state = ['_' for _ in range(self.observation_space.n)]
         state[self._state] = 'X'
         print(' '.join(state))
