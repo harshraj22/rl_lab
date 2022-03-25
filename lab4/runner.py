@@ -13,6 +13,7 @@ from utils.utils import Sample
 from utils.wrappers import LinearEnvWrapper
 from base.baseagent import BaseAgent
 from omegaconf import OmegaConf
+import data_loader
 
 
 logger = logging.getLogger(__name__)
@@ -93,32 +94,42 @@ if __name__ == '__main__':
     config = OmegaConf.load('conf/config.yaml')
     random.seed(config.seed)
 
-    # ToDo: Create agent, environment depending on config
     # env = gym.make('FrozenLake-v1') # A discrete Action Space environment
-    env = LinearEnvWrapper(LinearEnv(max_time=8))
+    # env = LinearEnvWrapper(LinearEnv(max_time=8))
+    env = gym.make(config.env)
+
+    # ToDo: Automate the following
+    if config.env == 'SimpleLinear-v0':
+        env = LinearEnvWrapper(env)
+    
     env.seed(config.seed)
-    # agent = FirstVisitMonteCarlo(
-    #     env.observation_space.n,
-    #     env.action_space.n,
-    #     decay_factor=config.agent.montecarlo.decay_factor,
-    #     eps=config.agent.montecarlo.eps
-    #     )
-    # agent = SARSA(
-    #     env.observation_space.n,
-    #     env.action_space.n,
-    #     eps=config.agent.sarsa.eps,
-    #     decay_factor=config.agent.sarsa.decay_factor,
-    #     lr=config.agent.sarsa.lr,
-    #     gamma=config.agent.sarsa.gamma
-    #     )
-    agent = QLearning(
-        env.observation_space.n,
-        env.action_space.n,
-        eps=config.agent.qlearning.eps,
-        decay_factor=config.agent.qlearning.decay_factor,
-        lr=config.agent.qlearning.lr,
-        gamma=config.agent.qlearning.gamma
-        )
+    if config.agent.type == 'montecarlo':
+        agent = FirstVisitMonteCarlo(
+            env.observation_space.n,
+            env.action_space.n,
+            decay_factor=config.agent.montecarlo.decay_factor,
+            eps=config.agent.montecarlo.eps
+            )
+    elif config.agent.type == 'sarsa':
+        agent = SARSA(
+            env.observation_space.n,
+            env.action_space.n,
+            eps=config.agent.sarsa.eps,
+            decay_factor=config.agent.sarsa.decay_factor,
+            lr=config.agent.sarsa.lr,
+            gamma=config.agent.sarsa.gamma
+            )
+    elif config.agent.type == 'qlearning':
+        agent = QLearning(
+            env.observation_space.n,
+            env.action_space.n,
+            eps=config.agent.qlearning.eps,
+            decay_factor=config.agent.qlearning.decay_factor,
+            lr=config.agent.qlearning.lr,
+            gamma=config.agent.qlearning.gamma
+            )
+    else:
+        raise ValueError(f'Unknown agent type: {config.agent.type}. Select one of: montecarlo, sarsa, qlearning')
 
     # mentioned in algo, to fill Q[terminal_state][*] with 0
     # agent.Q[-1] = 0
