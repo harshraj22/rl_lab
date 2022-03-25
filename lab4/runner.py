@@ -7,6 +7,7 @@ import gym
 
 from data_loader.environments import LinearEnv
 from models.on_policy_mc import FirstVisitMonteCarlo
+from models.sarsa import SARSA
 from utils.utils import Sample
 from base.baseagent import BaseAgent
 from omegaconf import OmegaConf
@@ -31,7 +32,7 @@ logger.propagate = False
 """
 
 
-def learn_offline(agent: BaseAgent, env: gym.Env, config) -> BaseAgent:
+def learn(agent: BaseAgent, env: gym.Env, config) -> BaseAgent:
     """Function to train the agents that learn offline.
     Parameters:
     ----------
@@ -50,7 +51,7 @@ def learn_offline(agent: BaseAgent, env: gym.Env, config) -> BaseAgent:
     recieved_perfect = 0
     for episode in tqdm(range(config.num_episodes)):
         state = env.reset()
-        done = False
+        done, reward = False, 0
         trajectory = []
 
         while not done:
@@ -59,20 +60,25 @@ def learn_offline(agent: BaseAgent, env: gym.Env, config) -> BaseAgent:
             next_state, reward, done, _ = env.step(action)
             trajectory.append(Sample(state, action, reward, next_state))
             state = next_state
+            if agent.mode == 'online':
+                agent.step(Sample(state, action, reward, next_state))
             # env.render()
         
-        # calculate the discounted sum of returns
-        inverted_returns = [0]
-        for sample in reversed(trajectory):
-            inverted_returns.append(sample.reward + inverted_returns[-1])
+        if agent.mode == 'offline':
+            # calculate the discounted sum of returns
+            inverted_returns = [0]
+            for sample in reversed(trajectory):
+                inverted_returns.append(sample.reward + inverted_returns[-1])
 
-        returns = list(reversed(inverted_returns[1:]))
-        visited = set()
-        for sample, return_ in zip(trajectory, returns):
-            if (sample.state, sample.action) not in visited:
-                agent.step(Sample(sample.state, sample.action, return_, sample.next_state))
-            visited.add((sample.state, sample.action))
-        
+            returns = list(reversed(inverted_returns[1:]))
+            visited = set()
+            for sample, return_ in zip(trajectory, returns):
+                if (sample.state, sample.action) not in visited:
+                    agent.step(Sample(sample.state, sample.action, return_, sample.next_state))
+                visited.add((sample.state, sample.action))
+        else:
+            returns = [reward]
+            
         agent.learn()
         recieved_perfect += int(returns[0])
         logger.info(f'Episode {episode}/{config.num_episodes}, Reward: {returns[0]:.3f}, Epsilon: {agent.eps:.3f}, time: {len(trajectory)} | recieved perfect: {recieved_perfect}')
@@ -86,26 +92,27 @@ if __name__ == '__main__':
     random.seed(config.seed)
 
     # ToDo: Create agent, environment depending on config
-    env = gym.make('FrozenLake-v1') # A discrete Action Space environment
-    # env = LinearEnv(max_time=8)
+    # env = gym.make('FrozenLake-v1') # A discrete Action Space environment
+    env = LinearEnv(max_time=8)
     env.seed(config.seed)
-    agent = FirstVisitMonteCarlo(
-        env.observation_space.n,
-        env.action_space.n,
-        decay_factor=config.agent.montecarlo.decay_factor,
-        eps=config.agent.montecarlo.eps
-        )
+    # agent = FirstVisitMonteCarlo(
+    #     env.observation_space.n,
+    #     env.action_space.n,
+    #     decay_factor=config.agent.montecarlo.decay_factor,
+    #     eps=config.agent.montecarlo.eps
+    #     )
+    agent = SARSA(env.observation_space.n, env.action_space.n)
 
     print(f'Details about env: Actions: {env.action_space.n} | States: {env.observation_space.n}')
-    trained_agent = learn_offline(agent, env, config)
+    trained_agent = learn(agent, env, config)
 
     # Test the agent
-    done, state, reward = False, env.reset(), 0
-    while not done:
-        action = trained_agent.forward(state)
-        state, reward, done, _ = env.step(action)
-        env.render()
-    print(f'Reward: {reward}')
+    # done, state, reward = False, env.reset(), 0
+    # while not done:
+    #     action = trained_agent.forward(state)
+    #     state, reward, done, _ = env.step(action)
+    #     env.render()
+    # print(f'Reward: {reward}')
 
     
         

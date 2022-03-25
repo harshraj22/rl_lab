@@ -51,6 +51,8 @@ class FirstVisitMonteCarlo(BaseAgent):
         # Returns
         self.returns: DefaultDict[Tuple[int, int], Deque[int]] = defaultdict(lambda: deque())
 
+        self.mode = 'offline'
+
     def forward(self, state: int) -> int:
         """Select an action."""
         if np.random.rand() < self.eps:
