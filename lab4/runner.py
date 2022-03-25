@@ -1,3 +1,4 @@
+from pprint import pprint
 import sys
 import random
 import logging
@@ -52,7 +53,7 @@ def learn(agent: BaseAgent, env: gym.Env, config) -> BaseAgent:
         The trained agent.
     """
     recieved_perfect = 0
-    for episode in tqdm(range(config.num_episodes)):
+    for episode in tqdm(range(config.num_episodes), desc="Episode"):
         state = env.reset()
         done, reward = False, 0
         trajectory = []
@@ -91,7 +92,9 @@ def learn(agent: BaseAgent, env: gym.Env, config) -> BaseAgent:
 
 
 if __name__ == '__main__':
+    # Overwrite the default configuration with the one from the command line
     config = OmegaConf.load('conf/config.yaml')
+    config = OmegaConf.merge(config, OmegaConf.from_cli())
     random.seed(config.seed)
 
     # env = gym.make('FrozenLake-v1') # A discrete Action Space environment
