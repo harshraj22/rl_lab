@@ -1,0 +1,5 @@
+numpy
+gym
+tqdm
+wandb
+omegaconf
