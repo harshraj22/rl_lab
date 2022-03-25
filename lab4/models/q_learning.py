@@ -19,7 +19,7 @@ class QLearning(BaseAgent):
     Online: Agent updates the policy after every step (taking an action and
         recieving a reward).
     TD-0: The Error is calculated considering only reward from the next timestamp.
-        delta = R + gamma * Q(s', a') - Q(s, a)
+        delta = R + gamma * max_over_a'{ Q(s', a') } - Q(s, a)
     
     https://leimao.github.io/images/blog/2019-03-14-RL-On-Policy-VS-Off-Policy/q-learning.png
     """
