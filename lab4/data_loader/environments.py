@@ -25,11 +25,15 @@ class LinearEnv(gym.Env):
         self._state = 0
         return self._state
 
+    @property
+    def state(self) -> int:
+        return self._state
+
     def step(self, action):
         self._time += 1
         action = -1 if not action else action
         new_state = np.clip(self._state + action, 0, 5)
-        reward = 100 if new_state == 5 else new_state - self._state
+        reward = 1 if new_state == 5 else 0
         done = True if self._time >= self._max_time or new_state == 5 else False
         self._state = new_state
         return new_state, reward, done, {}

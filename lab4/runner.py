@@ -10,6 +10,7 @@ from models.on_policy_mc import FirstVisitMonteCarlo
 from models.q_learning import QLearning
 from models.sarsa import SARSA
 from utils.utils import Sample
+from utils.wrappers import LinearEnvWrapper
 from base.baseagent import BaseAgent
 from omegaconf import OmegaConf
 
@@ -94,7 +95,7 @@ if __name__ == '__main__':
 
     # ToDo: Create agent, environment depending on config
     # env = gym.make('FrozenLake-v1') # A discrete Action Space environment
-    env = LinearEnv(max_time=8)
+    env = LinearEnvWrapper(LinearEnv(max_time=8))
     env.seed(config.seed)
     # agent = FirstVisitMonteCarlo(
     #     env.observation_space.n,
