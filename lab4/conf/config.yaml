@@ -10,9 +10,9 @@ agent:
     eps: 0.35
     decay_factor: 0.99
     lr: 0.3
-    gamma: 1
+    gamma: 0.9
   qlearning:
     eps: 0.3
     decay_factor: 0.99
     lr: 0.4
-    gamma: 1
+    gamma: 0.95
