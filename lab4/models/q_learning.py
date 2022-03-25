@@ -76,5 +76,4 @@ class QLearning(BaseAgent):
         self.Q[state][action] += self.lr * (reward + self.gamma * self.Q[next_state].max() - self.Q[state][action])
 
         # update the policy
-        for state in range(self.num_states):
-            self.policy[state] = np.argmax(self.Q[state])
+        self.policy[state] = np.argmax(self.Q[state])
