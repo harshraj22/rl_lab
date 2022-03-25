@@ -73,3 +73,7 @@ class SARSA(BaseAgent):
         """Update the agent's knowledge and policy correspondingly"""
         state, action, reward, next_state = sample
         self.Q[state][action] += self.lr * (reward + self.gamma * self.Q[next_state][self.policy[next_state]] - self.Q[state][action])
+
+        # update the policy
+        for state in range(self.num_states):
+            self.policy[state] = np.argmax(self.Q[state])
