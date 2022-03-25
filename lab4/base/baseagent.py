@@ -8,6 +8,7 @@ from utils.utils import Sample
 
 class BaseAgent(ABC):
     """Abstract class for agents"""
+    mode: str = 'offline'
 
     @abstractmethod
     def forward(self, state: int) -> int:

@@ -7,6 +7,7 @@ import gym
 
 from data_loader.environments import LinearEnv
 from models.on_policy_mc import FirstVisitMonteCarlo
+from models.q_learning import QLearning
 from models.sarsa import SARSA
 from utils.utils import Sample
 from base.baseagent import BaseAgent
@@ -101,13 +102,21 @@ if __name__ == '__main__':
     #     decay_factor=config.agent.montecarlo.decay_factor,
     #     eps=config.agent.montecarlo.eps
     #     )
-    agent = SARSA(
+    # agent = SARSA(
+    #     env.observation_space.n,
+    #     env.action_space.n,
+    #     eps=config.agent.sarsa.eps,
+    #     decay_factor=config.agent.sarsa.decay_factor,
+    #     lr=config.agent.sarsa.lr,
+    #     gamma=config.agent.sarsa.gamma
+    #     )
+    agent = QLearning(
         env.observation_space.n,
         env.action_space.n,
-        eps=config.agent.sarsa.eps,
-        decay_factor=config.agent.sarsa.decay_factor,
-        lr=config.agent.sarsa.lr,
-        gamma=config.agent.sarsa.gamma
+        eps=config.agent.qlearning.eps,
+        decay_factor=config.agent.qlearning.decay_factor,
+        lr=config.agent.qlearning.lr,
+        gamma=config.agent.qlearning.gamma
         )
 
     print(f'Details about env: Actions: {env.action_space.n} | States: {env.observation_space.n}')

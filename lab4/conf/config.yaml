@@ -14,3 +14,5 @@ agent:
   qlearning:
     eps: 0.3
     decay_factor: 0.99
+    lr: 0.4
+    gamma: 0.99
