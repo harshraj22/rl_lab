@@ -82,7 +82,7 @@ def learn(agent: BaseAgent, env: gym.Env, config) -> BaseAgent:
         agent.learn()
         recieved_perfect += int(returns[0])
         logger.info(f'Episode {episode}/{config.num_episodes}, Reward: {returns[0]:.3f}, Epsilon: {agent.eps:.3f}, time: {len(trajectory)} | recieved perfect: {recieved_perfect}')
-        # logger.info(f'Q: {agent.Q}')
+        logger.info(f'Q: {agent.Q}')
         # logger.info(f'Returns: {returns}\n Trajectory: {trajectory}')
     return agent
 
@@ -101,7 +101,14 @@ if __name__ == '__main__':
     #     decay_factor=config.agent.montecarlo.decay_factor,
     #     eps=config.agent.montecarlo.eps
     #     )
-    agent = SARSA(env.observation_space.n, env.action_space.n)
+    agent = SARSA(
+        env.observation_space.n,
+        env.action_space.n,
+        eps=config.agent.sarsa.eps,
+        decay_factor=config.agent.sarsa.decay_factor,
+        lr=config.agent.sarsa.lr,
+        gamma=config.agent.sarsa.gamma
+        )
 
     print(f'Details about env: Actions: {env.action_space.n} | States: {env.observation_space.n}')
     trained_agent = learn(agent, env, config)
