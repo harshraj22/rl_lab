@@ -58,7 +58,7 @@ class SARSA(BaseAgent):
 
         self.mode = 'online'
 
-    
+
     def forward(self, state: int) -> int:
         """Select an action."""
         if np.random.rand() < self.eps:

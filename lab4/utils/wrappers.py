@@ -33,6 +33,9 @@ class MountainCarEnvWrapper(gym.Wrapper):
     Divides action space and observation space into n_bins bins each. each
     (action, observation) tuple is mapped to a unique integer representing the
     new state.
+
+    CAUTION: Not a generic wrapper for continious environments. Values specific
+        to MountainCar-v0 are hardcoded.
     """
     def __init__(self, env, n_bins: int = 10) -> None:
         super().__init__(env)
@@ -44,7 +47,7 @@ class MountainCarEnvWrapper(gym.Wrapper):
         self.observation_space = Discrete(self.n_bins * self.n_bins)
 
         # state = position_bin * n_bins + velocity_bin
-    
+
     def get_digitized_state(self, state: Tuple[float, float]) -> int:
         """Returns the digitized state."""
         position, velocity = state

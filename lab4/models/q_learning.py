@@ -10,7 +10,7 @@ from utils.utils import Sample
 
 class QLearning(BaseAgent):
     """Agent that uses Q-Learning. (TD-0)
-    
+
     Properties:
     ----------------
     Off Policy: The policy is not improved using samples generated from the current
@@ -20,7 +20,7 @@ class QLearning(BaseAgent):
         recieving a reward).
     TD-0: The Error is calculated considering only reward from the next timestamp.
         delta = R + gamma * max_over_a'{ Q(s', a') } - Q(s, a)
-    
+
     https://leimao.github.io/images/blog/2019-03-14-RL-On-Policy-VS-Off-Policy/q-learning.png
     """
 
