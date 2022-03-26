@@ -59,7 +59,7 @@ def learn(agent: BaseAgent, env: gym.Env, config) -> BaseAgent:
         trajectory = []
 
         while not done:
-            action = agent.forward(state)
+            action = agent(state)
             # logger.info(f'State: {state} | Action: {action}')
             next_state, reward, done, _ = env.step(action)
             trajectory.append(Sample(state, action, reward, next_state))
@@ -81,10 +81,10 @@ def learn(agent: BaseAgent, env: gym.Env, config) -> BaseAgent:
                     agent.step(Sample(sample.state, sample.action, return_, sample.next_state))
                 visited.add((sample.state, sample.action))
         else:
-            returns = [min(1, reward)]
+            returns = [reward]
             
         agent.learn()
-        recieved_perfect += int(returns[0])
+        recieved_perfect += min(1, int(returns[0]))
         logger.info(f'Episode {episode}/{config.num_episodes}, Reward: {returns[0]:.3f}, Epsilon: {agent.eps:.3f}, time: {len(trajectory)} | recieved perfect: {recieved_perfect}')
         # logger.info(f'Q: {agent.Q}')
         # logger.info(f'Returns: {returns}\n Trajectory: {trajectory}')
