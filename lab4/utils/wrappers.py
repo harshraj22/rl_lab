@@ -37,13 +37,13 @@ class MountainCarEnvWrapper(gym.Wrapper):
     CAUTION: Not a generic wrapper for continious environments. Values specific
         to MountainCar-v0 are hardcoded.
     """
-    def __init__(self, env, n_bins: int = 10) -> None:
+    def __init__(self, env, n_bins: int = 7) -> None:
         super().__init__(env)
 
         self.env = env
         self.n_bins = n_bins
         self.position_bins = np.linspace(-1.2, 0.07, self.n_bins)
-        self.velocity_bins = np.linspace(0.6, 0.07, self.n_bins)
+        self.velocity_bins = np.linspace(-0.06, 0.07, self.n_bins)
         self.observation_space = Discrete(self.n_bins * self.n_bins)
 
         # state = position_bin * n_bins + velocity_bin

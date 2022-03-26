@@ -2,6 +2,8 @@ import sys
 import random
 import logging
 from tqdm import tqdm
+import numpy as np
+from math import ceil
 
 import gym
 
@@ -83,7 +85,7 @@ def learn(agent: BaseAgent, env: gym.Env, config) -> BaseAgent:
             returns = [reward]
             
         agent.learn()
-        recieved_perfect += min(1, int(returns[0]))
+        recieved_perfect += ceil(np.clip(reward, 0, 1))
         logger.info(f'Episode {episode}/{config.num_episodes}, Reward: {returns[0]:.3f}, Epsilon: {agent.eps:.3f}, time: {len(trajectory)} | recieved perfect: {recieved_perfect}')
         # logger.info(f'Q: {agent.Q}')
         # logger.info(f'Returns: {returns}\n Trajectory: {trajectory}')

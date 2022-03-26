@@ -2,7 +2,7 @@ num_episodes: 5000
 env: SimpleLinear-v0 # Taxi-v3, MountainCar-v0, SimpleLinear-v0
 seed: 5
 agent:
-  type: qlearning # montecarlo, qlearning, sarsa
+  type: sarsa # montecarlo, qlearning, sarsa
   montecarlo:
     eps: 0.8
     decay_factor: 0.995
@@ -12,7 +12,7 @@ agent:
     lr: 0.3
     gamma: 0.9
   qlearning:
-    eps: 0.3
-    decay_factor: 0.99
+    eps: 0.4
+    decay_factor: 0.999
     lr: 0.4
     gamma: 0.95
