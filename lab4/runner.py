@@ -77,7 +77,8 @@ def learn(agent: BaseAgent, env: gym.Env, config) -> BaseAgent:
 
         returns = list(reversed(inverted_returns[1:]))
         wandb.log({
-            f'{config.env}/Reward': returns[0]
+            f'{config.env}/Reward': returns[0],
+            f'{config.env}/eps': agent.eps
         })
         if agent.mode == 'offline':
             visited = set()
