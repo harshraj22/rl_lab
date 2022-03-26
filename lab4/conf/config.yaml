@@ -1,5 +1,5 @@
 num_episodes: 5000
-env: SimpleLinear-v0 # Taxi-v3, MountainCar-v0, SimpleLinear-v0
+env: MountainCar-v0 # Taxi-v3, MountainCar-v0, SimpleLinear-v0
 seed: 5
 agent:
   type: sarsa # montecarlo, qlearning, sarsa

@@ -6,6 +6,7 @@ import numpy as np
 from math import ceil
 
 import gym
+import wandb
 
 from data_loader.environments import LinearEnv
 from models.on_policy_mc import FirstVisitMonteCarlo
@@ -67,7 +68,7 @@ def learn(agent: BaseAgent, env: gym.Env, config) -> BaseAgent:
             state = next_state
             if agent.mode == 'online':
                 agent.step(Sample(state, action, reward, next_state))
-            env.render('human')
+            # env.render('human')
         
         # calculate the discounted sum of returns
         inverted_returns = [0]
@@ -75,6 +76,9 @@ def learn(agent: BaseAgent, env: gym.Env, config) -> BaseAgent:
             inverted_returns.append(sample.reward + inverted_returns[-1])
 
         returns = list(reversed(inverted_returns[1:]))
+        wandb.log({
+            f'{config.env}/Reward': returns[0]
+        })
         if agent.mode == 'offline':
             visited = set()
             for sample, return_ in zip(trajectory, returns):
@@ -98,6 +102,9 @@ if __name__ == '__main__':
     config = OmegaConf.load('conf/config.yaml')
     config = OmegaConf.merge(config, OmegaConf.from_cli())
     random.seed(config.seed)
+
+    wandb.init(project='SARSA-MCMC-QLearning', mode='online')
+    wandb.run.name = config.agent.type
 
     # env = gym.make('FrozenLake-v1') # A discrete Action Space environment
     # env = LinearEnvWrapper(LinearEnv(max_time=8))
