@@ -11,7 +11,7 @@ from models.on_policy_mc import FirstVisitMonteCarlo
 from models.q_learning import QLearning
 from models.sarsa import SARSA
 from utils.utils import Sample
-from utils.wrappers import LinearEnvWrapper
+from utils.wrappers import LinearEnvWrapper, MountainCarEnvWrapper
 from base.baseagent import BaseAgent
 from omegaconf import OmegaConf
 import data_loader
@@ -86,7 +86,7 @@ def learn(agent: BaseAgent, env: gym.Env, config) -> BaseAgent:
         agent.learn()
         recieved_perfect += int(returns[0])
         logger.info(f'Episode {episode}/{config.num_episodes}, Reward: {returns[0]:.3f}, Epsilon: {agent.eps:.3f}, time: {len(trajectory)} | recieved perfect: {recieved_perfect}')
-        logger.info(f'Q: {agent.Q}')
+        # logger.info(f'Q: {agent.Q}')
         # logger.info(f'Returns: {returns}\n Trajectory: {trajectory}')
     return agent
 
@@ -104,6 +104,8 @@ if __name__ == '__main__':
     # ToDo: Automate the following
     if config.env == 'SimpleLinear-v0':
         env = LinearEnvWrapper(env)
+    elif config.env == 'MountainCar-v0':
+        env = MountainCarEnvWrapper(env)
     
     env.seed(config.seed)
     if config.agent.type == 'montecarlo':
