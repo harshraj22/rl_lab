@@ -62,33 +62,34 @@ def learn(agent: BaseAgent, env: gym.Env, config) -> BaseAgent:
         while not done:
             action = agent(state)
             # logger.info(f'State: {state} | Action: {action}')
-            next_state, reward, done, _ = env.step(action)
+            next_state, reward, done, info = env.step(action)
             trajectory.append(Sample(state, action, reward, next_state))
             state = next_state
             if agent.mode == 'online':
                 agent.step(Sample(state, action, reward, next_state))
-            # env.render()
+            env.render('human')
         
-        if agent.mode == 'offline':
-            # calculate the discounted sum of returns
-            inverted_returns = [0]
-            for sample in reversed(trajectory):
-                inverted_returns.append(sample.reward + inverted_returns[-1])
+        # calculate the discounted sum of returns
+        inverted_returns = [0]
+        for sample in reversed(trajectory):
+            inverted_returns.append(sample.reward + inverted_returns[-1])
 
-            returns = list(reversed(inverted_returns[1:]))
+        returns = list(reversed(inverted_returns[1:]))
+        if agent.mode == 'offline':
             visited = set()
             for sample, return_ in zip(trajectory, returns):
                 if (sample.state, sample.action) not in visited:
                     agent.step(Sample(sample.state, sample.action, return_, sample.next_state))
                 visited.add((sample.state, sample.action))
         else:
-            returns = [reward]
+            # returns = [reward]
+            pass
             
         agent.learn()
         recieved_perfect += ceil(np.clip(reward, 0, 1))
         logger.info(f'Episode {episode}/{config.num_episodes}, Reward: {returns[0]:.3f}, Epsilon: {agent.eps:.3f}, time: {len(trajectory)} | recieved perfect: {recieved_perfect}')
         # logger.info(f'Q: {agent.Q}')
-        # logger.info(f'Returns: {returns}\n Trajectory: {trajectory}')
+        # logger.info(f'Returns: {returns}')
     return agent
 
 
