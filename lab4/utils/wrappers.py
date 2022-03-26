@@ -42,8 +42,8 @@ class MountainCarEnvWrapper(gym.Wrapper):
 
         self.env = env
         self.n_bins = n_bins
-        self.position_bins = np.linspace(-1.2, 0.07, self.n_bins)
-        self.velocity_bins = np.linspace(-0.06, 0.07, self.n_bins)
+        self.position_bins = np.linspace(-1.2, 0.6, self.n_bins)
+        self.velocity_bins = np.linspace(-0.07, 0.071, self.n_bins)
         self.observation_space = Discrete(self.n_bins * self.n_bins)
 
         # state = position_bin * n_bins + velocity_bin
@@ -55,6 +55,7 @@ class MountainCarEnvWrapper(gym.Wrapper):
         velocity_bin = np.digitize(velocity, self.velocity_bins)
 
         new_state = position_bin * self.n_bins + velocity_bin
+        assert new_state <= self.observation_space.n, f'Position: {position}-{position_bin}, velocity: {velocity}-{velocity_bin}'
         return int(new_state)
 
     def step(self, action: int):
