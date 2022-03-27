@@ -104,7 +104,7 @@ if __name__ == '__main__':
     config = OmegaConf.merge(config, OmegaConf.from_cli())
     random.seed(config.seed)
 
-    wandb.init(project='SARSA-MCMC-QLearning', mode='online')
+    wandb.init(project='SARSA-MCMC-QLearning', mode='disabled')
     wandb.run.name = config.agent.type
 
     # env = gym.make('FrozenLake-v1') # A discrete Action Space environment
@@ -150,6 +150,8 @@ if __name__ == '__main__':
     # agent.Q[-1] = 0
     print(f'Details about env: Actions: {env.action_space.n} | States: {env.observation_space.n}')
     trained_agent = learn(agent, env, config)
+
+
 
     # Test the agent
     # done, state, reward = False, env.reset(), 0
