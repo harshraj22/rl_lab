@@ -7,10 +7,10 @@ agent:
     eps: 0.8
     decay_factor: 0.995
   sarsa:
-    eps: 0.35
-    decay_factor: 0.99
+    eps: 0.8
+    decay_factor: 0.999
     lr: 0.3
-    gamma: 0.9
+    gamma: 0.99
   qlearning:
     eps: 0.4
     decay_factor: 0.999

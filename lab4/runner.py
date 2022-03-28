@@ -65,9 +65,10 @@ def learn(agent: BaseAgent, env: gym.Env, config) -> BaseAgent:
             # logger.info(f'State: {state} | Action: {action}')
             next_state, reward, done, info = env.step(action)
             trajectory.append(Sample(state, action, reward, next_state))
-            state = next_state
+            # state = next_state
             if agent.mode == 'online':
                 agent.step(Sample(state, action, reward, next_state))
+            state = next_state
             # env.render('human')
         
         # calculate the discounted sum of returns
@@ -103,6 +104,7 @@ if __name__ == '__main__':
     config = OmegaConf.load('conf/config.yaml')
     config = OmegaConf.merge(config, OmegaConf.from_cli())
     random.seed(config.seed)
+    np.random.seed(config.seed)
 
     wandb.init(project='SARSA-MCMC-QLearning', mode='disabled')
     wandb.run.name = config.agent.type
@@ -115,6 +117,7 @@ if __name__ == '__main__':
     if config.env == 'SimpleLinear-v0':
         env = LinearEnvWrapper(env)
     elif config.env == 'MountainCar-v0':
+        env._max_episode_steps = 1000
         env = MountainCarEnvWrapper(env)
     
     env.seed(config.seed)

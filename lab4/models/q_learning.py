@@ -56,7 +56,7 @@ class QLearning(BaseAgent):
         self.policy = np.random.randint(0, self.num_actions, size=self.num_states)
 
         # initialize the Q-values
-        self.Q = np.random.randn(self.num_states, self.num_actions)
+        self.Q = np.zeros((self.num_states, self.num_actions))
 
         self.mode = 'online'
 
