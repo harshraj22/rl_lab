@@ -41,21 +41,27 @@ logger.addHandler(c_handler)
 logger.propagate = False
 
 
-wandb.init(project="ppo-Enhanced-CartPole-v1", entity="harshraj22", mode="disabled")
+wandb.init(project="ppo-Enhanced-CartPole-v1", entity="rl-mini-project-2022", mode="disabled")
 
 @hydra.main(config_path="conf", config_name="config")
 def main(cfg):
+    """Entry point of the program"""
     random.seed(cfg.exp.seed)
     np.random.seed(cfg.exp.seed)
     torch.manual_seed(cfg.exp.seed)
     torch.backends.cudnn.deterministic = cfg.exp.torch_deterministic
 
     # so that the environment automatically resets
-    env = SyncVectorEnv([
-        lambda: RecordEpisodeStatistics(gym.make('CartPole-v1'))
-    ])
+    if cfg.env == "CartPole-v1":
+        env = RecordEpisodeStatistics(gym.make('CartPole-v1'))
+        ACTION_SPACE, OBS_SPACE = 2, 4
+    elif cfg.env == "Taxi-v3": # or cfg.env == "FrozenLake-v1":
+        env = RecordEpisodeStatistics(gym.make(cfg.env))
+        ACTION_SPACE, OBS_SPACE = env.action_space.n, env.observation_space.n
+    else:
+        raise ValueError("Environment not supported. Choose from 'CartPole-v1', 'Taxi-v3'")
 
-    actor, critic = Actor(), Critic()
+    actor, critic = Actor(in_dim=OBS_SPACE, out_dim=ACTION_SPACE), Critic(in_dim=OBS_SPACE)
     actor_optim = Adam(actor.parameters(), eps=1e-5, lr=cfg.params.actor_lr)
     critic_optim = Adam(critic.parameters(), eps=1e-5, lr=cfg.params.critic_lr)
     memory = Memory(mini_batch_size=cfg.params.mini_batch_size, batch_size=cfg.params.batch_size)
@@ -88,12 +94,13 @@ def main(cfg):
         log_prob = log_prob.cpu().numpy()
         obs_, reward, done, info = env.step(action)
         
-        if done[0]:
-            tqdm.write(f'Reward: {info[0]["episode"]["r"]}, Avg Reward: {np.mean(global_rewards[-10:]):.3f}')
-            global_rewards.append(info[0]['episode']['r'])
-            wandb.log({'Avg_Reward': np.mean(global_rewards[-10:]), 'Reward': info[0]['episode']['r']})
+        if done:
+            tqdm.write(f'Reward: {info}, Avg Reward: {np.mean(global_rewards[-10:]):.3f}')
+            global_rewards.append(info['episode']['r'])
+            wandb.log({'Avg_Reward': np.mean(global_rewards[-10:]), 'Reward': info['episode']['r']})
 
-        memory.remember(obs.squeeze(0).cpu().numpy(), action.item(), log_prob.item(), reward.item(), done.item(), value.item())
+        print(action, log_prob, reward, done, value)
+        memory.remember(obs.squeeze(0).cpu().numpy(), action, log_prob, reward, done, value.item())
         obs = obs_
         cur_timestep += 1
 

@@ -1,7 +1,7 @@
 params:
   batch_size: 128
   mini_batch_size: 8
-  total_timesteps: 100_000
+  total_timesteps: 128
   epochs: 8
   actor_loss_clip: 0.2
   critic_loss_clip: 0.2
@@ -15,3 +15,4 @@ exp:
   model_dir: weights
   seed: 23
   torch_deterministic: True
+env: CartPole-v1 # Taxi-v3, CartPole-v1, 

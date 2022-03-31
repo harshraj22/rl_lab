@@ -22,6 +22,7 @@ def layer_init(layer, std=np.sqrt(2), bias_const=0.0):
 
 # To Do: Check BatchNorm
 class Actor(nn.Module):
+    """Class for Actor Network to approximate the policy"""
     def __init__(self, in_dim=4, out_dim=2):
         super(Actor, self).__init__()
         """Assuming the Actor for CartPole-v1 """
@@ -41,31 +42,8 @@ class Actor(nn.Module):
         return Categorical(action)
 
 
-class ActorContinious(nn.Module):
-    def __init__(self, in_dim=4, out_dim=2):
-        super(ActorContinious, self).__init__()
-        """Assuming the Actor for CartPole-v1 """
-        self.l1 = nn.Sequential(
-                layer_init(nn.Linear(in_dim, 64)),
-                nn.Tanh(),
-                layer_init(nn.Linear(64, 64)),
-                nn.Tanh(),
-                layer_init(nn.Linear(64, out_dim), std=0.01),
-            )
-
-        self.log_std = nn.Parameter(torch.zeros(out_dim))
-        # self.l2 = layer_init(nn.Linear(64, 2), std=0.01)
-
-    def forward(self, state):
-        means = self.l1(state)
-        log_stds = self.log_std
-        action_std = torch.exp(log_stds)
-        dist = Normal(means, action_std)
-
-        return dist
-
-
 class Critic(nn.Module):
+    """Class for Critic Network to approximate the value function"""
     def __init__(self, in_dim=4):
         super(Critic, self).__init__()
         """Assuming the critic for CartPole-v1"""
