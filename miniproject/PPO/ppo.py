@@ -33,7 +33,7 @@ from pathlib import Path
 warnings.filterwarnings("ignore")
 
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.NOTSET)
+logger.setLevel(logging.CRITICAL)
 c_handler = logging.StreamHandler()
 c_format = logging.Formatter('%(name)s : %(levelname)s - %(message)s')
 c_handler.setFormatter(c_format)
@@ -41,7 +41,7 @@ logger.addHandler(c_handler)
 logger.propagate = False
 
 
-wandb.init(project="ppo-Enhanced-CartPole-v1", entity="rl-mini-project-2022", mode="disabled")
+wandb.init(project="ppo-Enhanced-CartPole-v1", entity="rl-mini-project-2022", mode="online")
 
 @hydra.main(config_path="conf", config_name="config")
 def main(cfg):
@@ -50,6 +50,8 @@ def main(cfg):
     np.random.seed(cfg.exp.seed)
     torch.manual_seed(cfg.exp.seed)
     torch.backends.cudnn.deterministic = cfg.exp.torch_deterministic
+
+    wandb.run.name = cfg.env
 
     # so that the environment automatically resets
     if cfg.env == "CartPole-v1":
@@ -102,7 +104,7 @@ def main(cfg):
             global_rewards.append(info['episode']['r'])
             wandb.log({'Avg_Reward': np.mean(global_rewards[-10:]), 'Reward': info['episode']['r']})
 
-        print(action, log_prob, reward, done, value)
+        # print(action, log_prob, reward, done, value)
         memory.remember(obs.squeeze(0).cpu().numpy(), action, log_prob, reward, done, value.item())
         obs = obs_
         cur_timestep += 1
@@ -180,8 +182,8 @@ def main(cfg):
             wandb.log({'Explained_Var': explained_var})
 
     if cfg.exp.save_weights:
-        torch.save(actor.state_dict(), Path(f'{hydra.utils.get_original_cwd()}/{cfg.exp.model_dir}/actor.pth'))
-        torch.save(critic.state_dict(), Path(f'{hydra.utils.get_original_cwd()}/{cfg.exp.model_dir}/critic.pth'))
+        torch.save(actor.state_dict(), Path(f'{hydra.utils.get_original_cwd()}/{cfg.exp.model_dir}/{cfg.env}_actor.pth'))
+        torch.save(critic.state_dict(), Path(f'{hydra.utils.get_original_cwd()}/{cfg.exp.model_dir}/{cfg.env}_critic.pth'))
 
 
 if __name__ == '__main__':
