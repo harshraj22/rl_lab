@@ -15,7 +15,7 @@ from torch.optim.lr_scheduler import LambdaLR
 
 from models.models import Actor, Critic
 from utils.memory import Memory
-from utils.utils import calculate_advantage
+from utils.utils import calculate_advantage, TaxiEnvWrapper
 
 import gym
 from gym.vector import SyncVectorEnv
@@ -56,7 +56,7 @@ def main(cfg):
         env = RecordEpisodeStatistics(gym.make('CartPole-v1'))
         ACTION_SPACE, OBS_SPACE = 2, 4
     elif cfg.env == "Taxi-v3": # or cfg.env == "FrozenLake-v1":
-        env = RecordEpisodeStatistics(gym.make(cfg.env))
+        env = TaxiEnvWrapper(RecordEpisodeStatistics(gym.make(cfg.env)))
         ACTION_SPACE, OBS_SPACE = env.action_space.n, 1
     else:
         raise ValueError("Environment not supported. Choose from 'CartPole-v1', 'Taxi-v3'")
@@ -86,7 +86,7 @@ def main(cfg):
         # obs = torch.as_tensor(obs, dtype=torch.float32)
         obs = torch.tensor(obs, dtype=torch.float32)
         with torch.no_grad():
-            print(obs)
+            # print(obs)
             dist = actor(obs)
             action = dist.sample()
             log_prob = dist.log_prob(action)
@@ -94,6 +94,7 @@ def main(cfg):
         action = action.cpu().numpy()
         value = value.cpu().numpy()
         log_prob = log_prob.cpu().numpy()
+        logger.info(f'Action: {action} | type: {type(action)}')
         obs_, reward, done, info = env.step(action)
         
         if done:
@@ -124,7 +125,8 @@ def main(cfg):
                     # remember: Normalization of advantage is done on mini batch, not the entire batch
                     advantage[mini_batch_index] = (advantage[mini_batch_index] - advantage[mini_batch_index].mean()) / (advantage[mini_batch_index].std() + 1e-8)
 
-                    dist = actor(torch.tensor(old_states[mini_batch_index], dtype=torch.float32).unsqueeze(0))
+                    logger.info(f'old_states: {torch.tensor(old_states[mini_batch_index], dtype=torch.float32).view(len(mini_batch_index), OBS_SPACE).shape}')
+                    dist = actor(torch.tensor(old_states[mini_batch_index], dtype=torch.float32).view(len(mini_batch_index), OBS_SPACE))
                     # actions = dist.sample()
                     log_probs = dist.log_prob(old_actions[mini_batch_index]).squeeze(0)
                     entropy = dist.entropy().squeeze(0)
@@ -142,7 +144,10 @@ def main(cfg):
                         torch.clamp(ratio, 1 - cfg.params.actor_loss_clip, 1 + cfg.params.actor_loss_clip) * advantage[mini_batch_index]
                     ).mean()
 
-                    values = critic(torch.tensor(old_states[mini_batch_index], dtype=torch.float32).unsqueeze(0)).squeeze(-1)
+                    logger.info(f'Critic input: {torch.tensor(old_states[mini_batch_index], dtype=torch.float32).view(len(mini_batch_index), OBS_SPACE).shape}')
+                    
+                    
+                    values = critic(torch.tensor(old_states[mini_batch_index], dtype=torch.float32).view(len(mini_batch_index), OBS_SPACE)).squeeze(-1)
                     returns = old_values[mini_batch_index] + advantage[mini_batch_index]
 
                     critic_loss = torch.max(
