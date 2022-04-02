@@ -57,7 +57,7 @@ def main(cfg):
         ACTION_SPACE, OBS_SPACE = 2, 4
     elif cfg.env == "Taxi-v3": # or cfg.env == "FrozenLake-v1":
         env = RecordEpisodeStatistics(gym.make(cfg.env))
-        ACTION_SPACE, OBS_SPACE = env.action_space.n, env.observation_space.n
+        ACTION_SPACE, OBS_SPACE = env.action_space.n, 1
     else:
         raise ValueError("Environment not supported. Choose from 'CartPole-v1', 'Taxi-v3'")
 
@@ -83,8 +83,10 @@ def main(cfg):
 
     while cur_timestep < cfg.params.total_timesteps:
         # keep playing the game
-        obs = torch.as_tensor(obs, dtype=torch.float32)
+        # obs = torch.as_tensor(obs, dtype=torch.float32)
+        obs = torch.tensor(obs, dtype=torch.float32)
         with torch.no_grad():
+            print(obs)
             dist = actor(obs)
             action = dist.sample()
             log_prob = dist.log_prob(action)
