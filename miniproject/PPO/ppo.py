@@ -15,7 +15,7 @@ from torch.optim.lr_scheduler import LambdaLR
 
 from models.models import Actor, Critic
 from utils.memory import Memory
-from utils.utils import calculate_advantage
+from utils.utils import calculate_advantage, TaxiEnvWrapper
 
 import gym
 from gym.vector import SyncVectorEnv
@@ -33,7 +33,7 @@ from pathlib import Path
 warnings.filterwarnings("ignore")
 
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.NOTSET)
+logger.setLevel(logging.CRITICAL)
 c_handler = logging.StreamHandler()
 c_format = logging.Formatter('%(name)s : %(levelname)s - %(message)s')
 c_handler.setFormatter(c_format)
@@ -41,7 +41,7 @@ logger.addHandler(c_handler)
 logger.propagate = False
 
 
-wandb.init(project="ppo-Enhanced-CartPole-v1", entity="rl-mini-project-2022", mode="disabled")
+wandb.init(project="ppo-Enhanced-CartPole-v1", entity="rl-mini-project-2022", mode="online")
 
 @hydra.main(config_path="conf", config_name="config")
 def main(cfg):
@@ -51,13 +51,15 @@ def main(cfg):
     torch.manual_seed(cfg.exp.seed)
     torch.backends.cudnn.deterministic = cfg.exp.torch_deterministic
 
+    wandb.run.name = cfg.env
+
     # so that the environment automatically resets
     if cfg.env == "CartPole-v1":
         env = RecordEpisodeStatistics(gym.make('CartPole-v1'))
         ACTION_SPACE, OBS_SPACE = 2, 4
     elif cfg.env == "Taxi-v3": # or cfg.env == "FrozenLake-v1":
-        env = RecordEpisodeStatistics(gym.make(cfg.env))
-        ACTION_SPACE, OBS_SPACE = env.action_space.n, env.observation_space.n
+        env = TaxiEnvWrapper(RecordEpisodeStatistics(gym.make(cfg.env)))
+        ACTION_SPACE, OBS_SPACE = env.action_space.n, 1
     else:
         raise ValueError("Environment not supported. Choose from 'CartPole-v1', 'Taxi-v3'")
 
@@ -83,8 +85,10 @@ def main(cfg):
 
     while cur_timestep < cfg.params.total_timesteps:
         # keep playing the game
-        obs = torch.as_tensor(obs, dtype=torch.float32)
+        # obs = torch.as_tensor(obs, dtype=torch.float32)
+        obs = torch.tensor(obs, dtype=torch.float32)
         with torch.no_grad():
+            # print(obs)
             dist = actor(obs)
             action = dist.sample()
             log_prob = dist.log_prob(action)
@@ -92,6 +96,7 @@ def main(cfg):
         action = action.cpu().numpy()
         value = value.cpu().numpy()
         log_prob = log_prob.cpu().numpy()
+        logger.info(f'Action: {action} | type: {type(action)}')
         obs_, reward, done, info = env.step(action)
         
         if done:
@@ -99,7 +104,7 @@ def main(cfg):
             global_rewards.append(info['episode']['r'])
             wandb.log({'Avg_Reward': np.mean(global_rewards[-10:]), 'Reward': info['episode']['r']})
 
-        print(action, log_prob, reward, done, value)
+        # print(action, log_prob, reward, done, value)
         memory.remember(obs.squeeze(0).cpu().numpy(), action, log_prob, reward, done, value.item())
         obs = obs_
         cur_timestep += 1
@@ -122,7 +127,8 @@ def main(cfg):
                     # remember: Normalization of advantage is done on mini batch, not the entire batch
                     advantage[mini_batch_index] = (advantage[mini_batch_index] - advantage[mini_batch_index].mean()) / (advantage[mini_batch_index].std() + 1e-8)
 
-                    dist = actor(torch.tensor(old_states[mini_batch_index], dtype=torch.float32).unsqueeze(0))
+                    logger.info(f'old_states: {torch.tensor(old_states[mini_batch_index], dtype=torch.float32).view(len(mini_batch_index), OBS_SPACE).shape}')
+                    dist = actor(torch.tensor(old_states[mini_batch_index], dtype=torch.float32).view(len(mini_batch_index), OBS_SPACE))
                     # actions = dist.sample()
                     log_probs = dist.log_prob(old_actions[mini_batch_index]).squeeze(0)
                     entropy = dist.entropy().squeeze(0)
@@ -140,7 +146,10 @@ def main(cfg):
                         torch.clamp(ratio, 1 - cfg.params.actor_loss_clip, 1 + cfg.params.actor_loss_clip) * advantage[mini_batch_index]
                     ).mean()
 
-                    values = critic(torch.tensor(old_states[mini_batch_index], dtype=torch.float32).unsqueeze(0)).squeeze(-1)
+                    logger.info(f'Critic input: {torch.tensor(old_states[mini_batch_index], dtype=torch.float32).view(len(mini_batch_index), OBS_SPACE).shape}')
+                    
+                    
+                    values = critic(torch.tensor(old_states[mini_batch_index], dtype=torch.float32).view(len(mini_batch_index), OBS_SPACE)).squeeze(-1)
                     returns = old_values[mini_batch_index] + advantage[mini_batch_index]
 
                     critic_loss = torch.max(
@@ -173,8 +182,8 @@ def main(cfg):
             wandb.log({'Explained_Var': explained_var})
 
     if cfg.exp.save_weights:
-        torch.save(actor.state_dict(), Path(f'{hydra.utils.get_original_cwd()}/{cfg.exp.model_dir}/actor.pth'))
-        torch.save(critic.state_dict(), Path(f'{hydra.utils.get_original_cwd()}/{cfg.exp.model_dir}/critic.pth'))
+        torch.save(actor.state_dict(), Path(f'{hydra.utils.get_original_cwd()}/{cfg.exp.model_dir}/{cfg.env}_actor.pth'))
+        torch.save(critic.state_dict(), Path(f'{hydra.utils.get_original_cwd()}/{cfg.exp.model_dir}/{cfg.env}_critic.pth'))
 
 
 if __name__ == '__main__':

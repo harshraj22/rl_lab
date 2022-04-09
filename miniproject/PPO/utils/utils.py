@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 import numpy as np
 import numpy.typing as npt
+import gym
 
 
 def calculate_advantage(rewards: npt.ArrayLike, values: npt.ArrayLike, dones: npt.ArrayLike, gae_gamma=0.99, gae_lambda=0.95) -> npt.ArrayLike:
@@ -18,3 +19,18 @@ def calculate_advantage(rewards: npt.ArrayLike, values: npt.ArrayLike, dones: np
         advantage[t] = a_t
     
     return advantage
+
+
+class TaxiEnvWrapper(gym.Wrapper):
+    def __init__(self, env):
+        super().__init__(env)
+        self.env = env
+        self.action_space = env.action_space
+        self.observation_space = env.observation_space
+
+    def step(self, action):
+        obs, reward, done, info = self.env.step(action.item())
+        return [obs], reward, done, info
+    
+    def reset(self):
+        return [self.env.reset()]
