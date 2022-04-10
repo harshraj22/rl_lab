@@ -1,4 +1,4 @@
-num_episodes: 50
+num_episodes: 5000
 env: MountainCar-v0 # Taxi-v3, MountainCar-v0, SimpleLinear-v0
 seed: 5
 agent:

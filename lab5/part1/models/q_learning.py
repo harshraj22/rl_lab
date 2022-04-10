@@ -85,17 +85,15 @@ class QLearning(BaseAgent):
         state, action, reward, next_state = sample
         next_action = self.forward(next_state)
 
+        # Get coordinates of the given state in tile1, and tile2
         coordinates = self.Q.get_coordinates(state)
+        # Get coordinates of next state in tile1 and tile2
         next_coordinates = self.Q.get_coordinates(next_state)
 
         phi = np.sum([self.phi[coordinate] for coordinate in coordinates], axis=0)
         next_phi = np.sum([self.phi[coordinate] for coordinate in next_coordinates], axis=0)
 
-        # print(phi.shape)
-        # print(coordinates, phi.sum())
-
         error = reward + self.gamma * next_phi.dot(self.W) - phi.dot(self.W)
-
         self.W = self.W + self.lr * error * phi
 
         self.Q.update(state, action, phi.dot(self.W))
@@ -111,12 +109,16 @@ if __name__ == '__main__':
         ((10, 10), (0.04, 0.03)),
     ]
 
-    agent = QLearning([low, high], num_actions=3, tiling_specs=tiling_specs, feat_dim=100, eps=0.2, decay_factor=0.99, lr=0.2, gamma=0.9)
+    agent = QLearning([low, high], num_actions=3, tiling_specs=tiling_specs, feat_dim=100, eps=0.0, decay_factor=0.99, lr=0.2, gamma=0.9)
+
+    # Confirm that Q values are changing and so is the decision of taking a particular
+    # action in the given state
+    print([agent.Q.get((-1.0, 0.0), action) for action in range(3)])
 
     for _ in range(5):
-        print(agent((-1.0, 0.0)), end=' ')
-        print(agent.Q.get((-1.0, 0.0), 0), end=' | ')
+        print('Action:', agent((-1.0, 0.0)), end=', ')
+        print('Q Value:', agent.Q.get((-1.0, 0.0), 1), end=' | ')
         reward = np.random.randint(1, 1000)
-        agent.step(Sample((-1.0, 0.0), 0, reward, (0.0, 0.0)))
-        print(agent((-1.0, 0.0)), end=' ')
-        print(agent.Q.get((-1.0, 0.0), 0))
+        agent.step(Sample((-1.0, 0.0), 1, reward, (0.0, 0.0)))
+        print('-> Action:', agent((-1.0, 0.0)), end=', ')
+        print('-> Q Value:', agent.Q.get((-1.0, 0.0), 1))

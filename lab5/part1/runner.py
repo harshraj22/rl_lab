@@ -109,6 +109,7 @@ if __name__ == '__main__':
     # env = gym.make('FrozenLake-v1') # A discrete Action Space environment
     # env = LinearEnvWrapper(LinearEnv(max_time=8))
     env = gym.make(config.env)
+    env._max_episode_steps = 1000
 
     # ToDo: Automate the following
     positions_range = (-1.2, 0.6)
