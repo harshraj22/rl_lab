@@ -6,6 +6,8 @@ sys.path.append('..')
 
 from base.baseagent import BaseAgent
 from utils.utils import Sample
+from utils.tile import TiledQTable
+from utils.features import Phi
 
 
 class QLearning(BaseAgent):
@@ -24,15 +26,17 @@ class QLearning(BaseAgent):
     https://leimao.github.io/images/blog/2019-03-14-RL-On-Policy-VS-Off-Policy/q-learning.png
     """
 
-    def __init__(self, num_states: int, num_actions: int, eps: float = 0.2,
+    def __init__(self, states_range: List[Tuple[float, float]], num_actions: int, tiling_specs, feat_dim: int = 5, eps: float = 0.2,
         decay_factor: float = 0.99, lr: float = 0.2, gamma: float = 0.9) -> None:
         """
         Parameters:
         ----------
-        num_states : int
-            Number of states in the environment.
+        states_range : array like
+            Lower bounds for each dimension of state space.
         num_actions : int
             Number of actions in the environment.
+        feat_dim: int
+            Number of dimentions in features for each state.
         eps : float
             Probability of selecting a random action.
         decay_factor : float
@@ -44,8 +48,11 @@ class QLearning(BaseAgent):
         """
         super(QLearning, self).__init__()
 
-        self.num_states = num_states
+        self.states_range = states_range
         self.num_actions = num_actions
+        self.tiling_specs = tiling_specs
+        self.feat_dim = feat_dim
+        self.phi = Phi(self.feat_dim)
 
         self.eps = eps
         self.decay_factor = decay_factor
@@ -53,18 +60,21 @@ class QLearning(BaseAgent):
         self.gamma = gamma
 
         # initialize the policy
-        self.policy = np.random.randint(0, self.num_actions, size=self.num_states)
+        # self.policy = np.random.randint(0, self.num_actions, size=self.num_states)
+
+        self.W = np.random.randn(self.feat_dim)
 
         # initialize the Q-values
-        self.Q = np.zeros((self.num_states, self.num_actions))
+        self.Q = TiledQTable(self.states_range[0], self.states_range[1], self.tiling_specs, self.num_actions)
 
         self.mode = 'online'
 
-    def forward(self, state: int) -> int:
+    def forward(self, state) -> int:
         """Select an action."""
         if np.random.rand() < self.eps:
             return np.random.randint(0, self.num_actions)
-        return self.policy[state]
+        # return self.policy[state]
+        return int(np.argmax([self.Q.get(state, action) for action in range(self.num_actions)]))
 
     def learn(self) -> None:
         """Update the policy"""
@@ -73,7 +83,40 @@ class QLearning(BaseAgent):
     def step(self, sample: Sample) -> None:
         """Update the agent's knowledge and policy correspondingly"""
         state, action, reward, next_state = sample
-        self.Q[state][action] += self.lr * (reward + self.gamma * self.Q[next_state].max() - self.Q[state][action])
+        next_action = self.forward(next_state)
 
-        # update the policy
-        self.policy[state] = np.argmax(self.Q[state])
+        coordinates = self.Q.get_coordinates(state)
+        next_coordinates = self.Q.get_coordinates(next_state)
+
+        phi = np.sum([self.phi[coordinate] for coordinate in coordinates], axis=0)
+        next_phi = np.sum([self.phi[coordinate] for coordinate in next_coordinates], axis=0)
+
+        # print(phi.shape)
+        # print(coordinates, phi.sum())
+
+        error = reward + self.gamma * next_phi.dot(self.W) - phi.dot(self.W)
+
+        self.W = self.W + self.lr * error * phi
+
+        self.Q.update(state, action, phi.dot(self.W))
+
+
+if __name__ == '__main__':
+    positions_range = (-1.2, 0.6)
+    velocity_range = (-0.07, 0.071)
+    low, high = (positions_range[0], velocity_range[0]), (positions_range[1], velocity_range[1])
+
+    tiling_specs = [
+        ((10, 10), (0.0, 0.0)),
+        ((10, 10), (0.04, 0.03)),
+    ]
+
+    agent = QLearning([low, high], num_actions=3, tiling_specs=tiling_specs, feat_dim=100, eps=0.2, decay_factor=0.99, lr=0.2, gamma=0.9)
+
+    for _ in range(5):
+        print(agent((-1.0, 0.0)), end=' ')
+        print(agent.Q.get((-1.0, 0.0), 0), end=' | ')
+        reward = np.random.randint(1, 1000)
+        agent.step(Sample((-1.0, 0.0), 0, reward, (0.0, 0.0)))
+        print(agent((-1.0, 0.0)), end=' ')
+        print(agent.Q.get((-1.0, 0.0), 0))

@@ -8,15 +8,12 @@ from math import ceil
 import gym
 import wandb
 
-from data_loader.environments import LinearEnv
-from models.on_policy_mc import FirstVisitMonteCarlo
 from models.q_learning import QLearning
 from models.sarsa import SARSA
 from utils.utils import Sample
 from utils.wrappers import LinearEnvWrapper, MountainCarEnvWrapper
 from base.baseagent import BaseAgent
 from omegaconf import OmegaConf
-import data_loader
 
 
 logger = logging.getLogger(__name__)
@@ -114,45 +111,24 @@ if __name__ == '__main__':
     env = gym.make(config.env)
 
     # ToDo: Automate the following
-    if config.env == 'SimpleLinear-v0':
-        env = LinearEnvWrapper(env)
-    elif config.env == 'MountainCar-v0':
-        env._max_episode_steps = 1000
-        env = MountainCarEnvWrapper(env)
+    positions_range = (-1.2, 0.6)
+    velocity_range = (-0.07, 0.071)
+    low, high = (positions_range[0], velocity_range[0]), (positions_range[1], velocity_range[1])
+
+    tiling_specs = [
+        ((10, 10), (0.0, 0.0)),
+        ((10, 10), (0.04, 0.03)),
+    ]
+
+    agent = QLearning([low, high], num_actions=3, tiling_specs=tiling_specs, feat_dim=100, eps=0.2, decay_factor=0.99, lr=0.2, gamma=0.9)
+
+    learn(agent, env, config)
     
-    env.seed(config.seed)
-    if config.agent.type == 'montecarlo':
-        agent = FirstVisitMonteCarlo(
-            env.observation_space.n,
-            env.action_space.n,
-            decay_factor=config.agent.montecarlo.decay_factor,
-            eps=config.agent.montecarlo.eps
-            )
-    elif config.agent.type == 'sarsa':
-        agent = SARSA(
-            env.observation_space.n,
-            env.action_space.n,
-            eps=config.agent.sarsa.eps,
-            decay_factor=config.agent.sarsa.decay_factor,
-            lr=config.agent.sarsa.lr,
-            gamma=config.agent.sarsa.gamma
-            )
-    elif config.agent.type == 'qlearning':
-        agent = QLearning(
-            env.observation_space.n,
-            env.action_space.n,
-            eps=config.agent.qlearning.eps,
-            decay_factor=config.agent.qlearning.decay_factor,
-            lr=config.agent.qlearning.lr,
-            gamma=config.agent.qlearning.gamma
-            )
-    else:
-        raise ValueError(f'Unknown agent type: {config.agent.type}. Select one of: montecarlo, sarsa, qlearning')
 
     # mentioned in algo, to fill Q[terminal_state][*] with 0
-    # agent.Q[-1] = 0
-    print(f'Details about env: Actions: {env.action_space.n} | States: {env.observation_space.n}')
-    trained_agent = learn(agent, env, config)
+    # # agent.Q[-1] = 0
+    # print(f'Details about env: Actions: {env.action_space.n} | States: {env.observation_space.n}')
+    # trained_agent = learn(agent, env, config)
 
 
 
