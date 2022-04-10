@@ -89,7 +89,7 @@ def learn(agent: BaseAgent, env: gym.Env, config) -> BaseAgent:
             pass
             
         agent.learn()
-        recieved_perfect += ceil(np.clip(reward, 0, 1))
+        recieved_perfect += bool(returns[0] != -1000.000)
         logger.info(f'Episode {episode}/{config.num_episodes}, Reward: {returns[0]:.3f}, Epsilon: {agent.eps:.3f}, time: {len(trajectory)} | recieved perfect: {recieved_perfect}')
         # logger.info(f'Q: {agent.Q}')
         # logger.info(f'Returns: {returns}')
@@ -118,7 +118,7 @@ if __name__ == '__main__':
 
     tiling_specs = [
         ((10, 10), (0.0, 0.0)),
-        ((10, 10), (0.04, 0.03)),
+        ((10, 10), (0.02, 0.03)),
     ]
 
     agent = QLearning([low, high], num_actions=3, tiling_specs=tiling_specs, feat_dim=100, eps=0.2, decay_factor=0.99, lr=0.2, gamma=0.9)
