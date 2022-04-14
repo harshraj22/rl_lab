@@ -11,7 +11,7 @@ class Phi:
         self.num_feats = num_feats
 
     def __getitem__(self, index_: Tuple[int, int]):
-        index = index_[0] * index_[1]
+        index = index_[0] * 10 + index_[1]
         if index >= self.num_feats:
             raise IndexError("Index out of range")
         features = np.zeros(self.num_feats)

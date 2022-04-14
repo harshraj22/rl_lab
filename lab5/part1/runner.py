@@ -75,8 +75,7 @@ def learn(agent: BaseAgent, env: gym.Env, config) -> BaseAgent:
 
         returns = list(reversed(inverted_returns[1:]))
         wandb.log({
-            f'{config.env}/Reward': returns[0],
-            f'{config.env}/eps': agent.eps
+            f'Q-Learning/Reward': returns[0],
         })
         if agent.mode == 'offline':
             visited = set()
@@ -103,7 +102,7 @@ if __name__ == '__main__':
     random.seed(config.seed)
     np.random.seed(config.seed)
 
-    wandb.init(project='SARSA-MCMC-QLearning', mode='disabled')
+    wandb.init(project='Function Approximation')
     wandb.run.name = config.agent.type
 
     # env = gym.make('FrozenLake-v1') # A discrete Action Space environment
